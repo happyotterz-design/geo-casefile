@@ -1293,7 +1293,13 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
     return fetch(SUBMIT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)})
       .then(function(r){ return r.json(); }).then(function(j){ if(!j||!j.ok) throw new Error((j&&j.error)||'fail'); return j; });
   }
-  function failText(e){ return e&&e.message==='nourl' ? '선생님 수집 창구가 아직 준비 중이에요. 사진 저장을 먼저 해 두세요.' : '보내지 못했어요. 데이터 연결을 확인하고 다시 눌러 주세요.'; }
+  function failText(e){
+    var m=e&&e.message||'';
+    if(m==='nourl') return '선생님 수집 창구가 아직 준비 중이에요. 사진 저장을 먼저 해 두세요.';
+    if(m.indexOf('알 수 없는 요청')>-1) return '선생님 수집 창구가 옛 버전이에요. 선생님께 알려 주세요(Apps Script 새 버전 배포 필요).';
+    if(m&&m!=='fail'&&!/fetch|network|load/i.test(m)) return '선생님 창구에서 거절했어요: '+m;
+    return '보내지 못했어요. 데이터 연결을 확인하고 다시 눌러 주세요.';
+  }
   function sendPhoto(code,btn){
     var m=$('sendmsg-'+code); if(needTeam(m)) return; btn.disabled=true; m.textContent='보내는 중…'; m.className='msg';
     composite(code).then(function(url){
