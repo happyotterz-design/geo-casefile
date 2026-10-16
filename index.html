@@ -7,6 +7,8 @@
 <title>태종대 지오 사건파일</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&family=IBM+Plex+Sans+KR:wght@400;500;600&family=Nanum+Gothic+Coding:wght@400;700&family=Nanum+Pen+Script&display=swap">
 <style>
@@ -229,6 +231,22 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
 .thumb img{display:block;width:100%;height:auto}
 .thumb svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .shotbtns{display:flex;flex-wrap:wrap;gap:8px}
+.gform{background:#fff;border:1.5px solid var(--ink);border-radius:3px;padding:14px;display:flex;flex-direction:column;gap:10px;margin:10px 0 18px}
+.gkind{display:flex;gap:8px}.gkind button{flex:1;border:1.5px solid var(--rule);background:var(--paper);border-radius:999px;padding:7px 0;font-size:14px;font-weight:600;color:var(--ink-soft)}
+.gkind button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:#fff}
+.gprev{position:relative;border:1.5px dashed var(--rule);border-radius:3px;min-height:120px;display:grid;place-items:center;color:var(--ink-soft);font-size:13.5px;overflow:hidden;background:var(--paper-2)}
+.gprev img{width:100%;max-height:300px;object-fit:cover;display:block}
+.gloc{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--mono);font-size:13px;color:var(--ink-soft)}
+#gmap{height:340px;border:1.5px solid var(--ink);border-radius:3px;margin:8px 0 18px;background:#dfe9ee;z-index:0}
+.album{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:18px 14px;padding:6px 2px 10px}
+.pol{background:#fffef9;padding:8px 8px 12px;box-shadow:0 3px 10px rgba(28,42,46,.18);border-radius:2px;transform:rotate(-1.6deg);cursor:pointer;position:relative}
+.pol:nth-child(2n){transform:rotate(1.4deg)}.pol:nth-child(3n){transform:rotate(-.6deg)}
+.pol::before{content:"";position:absolute;top:-8px;left:50%;width:54px;height:16px;margin-left:-27px;background:rgba(232,220,160,.8);transform:rotate(-3deg)}
+.pol .ph{aspect-ratio:4/3;background:#e9efeb;overflow:hidden;display:grid;place-items:center;font-size:30px}
+.pol .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.pol .tx{font-family:'Nanum Pen Script',cursive;font-size:21px;line-height:1.15;color:#2b3f73;margin:8px 2px 4px;word-break:keep-all;overflow-wrap:anywhere}
+.pol .mt{font-size:11.5px;color:var(--ink-soft);display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap}
+.pol .q{position:absolute;top:12px;right:12px;background:#d8752a;color:#fff;font-size:11.5px;font-weight:700;border-radius:999px;padding:1px 8px}
 .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:8px 0 16px}
 .gallery figure{margin:0}
 /* drawing editor */
@@ -543,6 +561,25 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
     <button type="button" class="primary small" id="drawDone">저장</button>
   </div>
 </div>
+<section class="sheet" data-tab="guest" id="t-guest" hidden>
+  <div class="docmeta"><span>수사 수첩 <b>8</b></span><span>방명록</span></div>
+  <h1>수사 방명록</h1>
+  <p>오늘 수사에서 기억에 남는 장면을 사진 한 장과 한 줄로 남겨요. 궁금한 게 생겼다면 <b>질문</b>으로 남겨도 좋아요. 모든 조의 글이 앨범과 지도에 함께 모여요.</p>
+  <div class="gform">
+    <div class="gkind" role="group" aria-label="글 종류"><button type="button" data-gkind="방명록" aria-pressed="true">📝 방명록</button><button type="button" data-gkind="질문" aria-pressed="false">❓ 질문</button></div>
+    <div class="gprev" id="gPrev">사진은 선택이에요</div>
+    <div class="shotbtns"><button type="button" class="ghost small" id="gPhotoBtn">📷 사진 찍기 / 고르기</button><button type="button" class="ghost small" id="gPhotoDel" hidden>사진 빼기</button></div>
+    <textarea id="gText" maxlength="120" placeholder="예: 신선바위가 바다보다 높은 게 신기했다! / 이안제가 생기면 자갈은 어디로 가나요?"></textarea>
+    <div class="gloc"><button type="button" class="ghost small" id="gLocBtn">📍 지금 위치 넣기</button><span id="gLoc">위치 없음</span></div>
+    <div class="actions"><button type="button" class="primary" id="gSend">📤 방명록에 남기기</button><span class="msg" id="gMsg"></span></div>
+  </div>
+  <h2>방명록 지도</h2>
+  <p class="hint">위치를 넣은 글이 지도에 핀으로 꽂혀요. 파랑은 방명록, 주황은 질문.</p>
+  <div id="gmap"></div>
+  <div class="actions" style="justify-content:space-between"><h2 style="margin:0">앨범</h2><button type="button" class="ghost small" id="gReload">새로고침</button></div>
+  <div class="album" id="album"><p class="hint">불러오는 중…</p></div>
+</section>
+<input type="file" id="gPhotoInput" accept="image/*" hidden>
 <footer>등장인물과 2단계 데크 공사는 가상입니다. 감지해변의 이안제와 호안은 실제 시설입니다.</footer>
 </main>
 
@@ -636,7 +673,7 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
   };
   /* ===== 설정 끝 ===== */
 
-  var TABS = [['intro','0 안내'],['case','1 사건'],['people','2 인물'],['map','3 지도'],['missions','4 미션'],['final','5 최종 보고'],['report','6 보고서 복원'],['hearing','7 공청회']];
+  var TABS = [['intro','0 안내'],['case','1 사건'],['people','2 인물'],['map','3 지도'],['missions','4 미션'],['final','5 최종 보고'],['report','6 보고서 복원'],['hearing','7 공청회'],['guest','8 방명록']];
   var KEY='geo-casefile-v1';
   var S = fresh();
   function fresh(){return {team:'',solved:{},hint:{},reveal:{},notes:{},verify:{},memo:{},final:{done:false},report:{},rAttempts:0,rDone:false,hearing:'',started:Date.now()}}
@@ -669,6 +706,7 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
     TABS.forEach(function(t){ var on=t[0]===name; $('t-'+t[0]).hidden=!on; $('tb-'+t[0]).setAttribute('aria-selected',on?'true':'false'); });
     if(name==='report') renderReport();
     if(name==='final') renderFinal();
+    if(name==='guest') openGuest();
     $('tb-'+name).scrollIntoView({inline:'center',block:'nearest'});
     window.scrollTo({top:0});
     try{ history.replaceState(null,'','#'+name); }catch(e){}
@@ -1137,6 +1175,87 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
   }
   $('celClose').addEventListener('click',function(){ $('celebrate').hidden=true; });
   document.addEventListener('click',function(e){ if(e.target.closest('[data-celebrate]')) celebrate(); });
+
+
+  /* ---- 8 방명록 ---- */
+  var G={kind:'방명록',img:null,lat:null,lng:null,map:null,layer:null,items:[],markers:{}};
+  S.gdraft=S.gdraft||{};
+  if(S.gdraft.text) $('gText').value=S.gdraft.text;
+  if(S.gdraft.kind) G.kind=S.gdraft.kind;
+  if(S.gdraft.lat!=null){ G.lat=S.gdraft.lat; G.lng=S.gdraft.lng; }
+  function gSaveDraft(){ S.gdraft={text:$('gText').value,kind:G.kind,lat:G.lat,lng:G.lng}; save(); }
+  function gKindUI(){ document.querySelectorAll('[data-gkind]').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.gkind===G.kind?'true':'false'); }); $('gSend').textContent=G.kind==='질문'?'📤 질문 남기기':'📤 방명록에 남기기'; }
+  function gLocUI(){ $('gLoc').textContent = G.lat!=null ? G.lat.toFixed(5)+', '+G.lng.toFixed(5) : '위치 없음'; }
+  function gPrevUI(){ var b=$('gPrev'); if(G.img){ b.innerHTML='<img src="'+G.img+'" alt="남길 사진">'; $('gPhotoDel').hidden=false; } else { b.textContent='사진은 선택이에요'; $('gPhotoDel').hidden=true; } }
+  gKindUI(); gLocUI();
+  document.querySelectorAll('[data-gkind]').forEach(function(b){ b.addEventListener('click',function(){ G.kind=b.dataset.gkind; gKindUI(); gSaveDraft(); }); });
+  $('gText').addEventListener('input',gSaveDraft);
+  $('gPhotoBtn').addEventListener('click',function(){ $('gPhotoInput').click(); });
+  $('gPhotoDel').addEventListener('click',function(){ G.img=null; gPrevUI(); gIdbPut(null); });
+  $('gPhotoInput').addEventListener('change',function(){
+    var f=this.files&&this.files[0]; this.value=''; if(!f) return;
+    var rd=new FileReader(); rd.onload=function(){ var im=new Image(); im.onload=function(){
+      var k=Math.min(1,1000/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');
+      c.width=Math.round(im.naturalWidth*k); c.height=Math.round(im.naturalHeight*k); c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+      G.img=c.toDataURL('image/jpeg',.8); gPrevUI(); gIdbPut(G.img);
+      if(G.lat==null) gLocate(true);
+    }; im.src=rd.result; }; rd.readAsDataURL(f);
+  });
+  function gIdbPut(v){ if(!IDB) return; try{ IDB.transaction('kv','readwrite').objectStore('kv').put(v,'guestPhoto'); }catch(e){} }
+  function gIdbGet(){ if(!IDB) return; try{ var q=IDB.transaction('kv').objectStore('kv').get('guestPhoto'); q.onsuccess=function(){ if(q.result&&!G.img){ G.img=q.result; gPrevUI(); } }; }catch(e){} }
+  function gLocate(quiet){
+    if(!navigator.geolocation){ if(!quiet) $('gLoc').textContent='이 기기는 위치를 지원하지 않아요'; return; }
+    $('gLoc').textContent='위치 찾는 중…';
+    navigator.geolocation.getCurrentPosition(function(pos){ G.lat=pos.coords.latitude; G.lng=pos.coords.longitude; gLocUI(); gSaveDraft(); },
+      function(){ gLocUI(); if(!quiet) $('gLoc').textContent='위치를 못 가져왔어요 (위치 권한을 허용해 주세요)'; },
+      {enableHighAccuracy:true,timeout:15000,maximumAge:60000});
+  }
+  $('gLocBtn').addEventListener('click',function(){ gLocate(false); });
+  $('gSend').addEventListener('click',function(){
+    var m=$('gMsg'), t=$('gText').value.trim();
+    if(!t){ m.textContent='한 줄이라도 적어 주세요.'; m.className='msg bad'; $('gText').focus(); return; }
+    if(needTeam(m)) return;
+    var b=this; b.disabled=true; m.textContent='남기는 중…'; m.className='msg';
+    post({type:'guest',team:S.team,kind:G.kind,text:t,lat:G.lat,lng:G.lng,image:G.img||''}).then(function(){
+      $('gText').value=''; G.img=null; gPrevUI(); gIdbPut(null); gSaveDraft();
+      m.textContent='남겼어요! 앨범에 붙었어요.'; m.className='msg ok'; gLoad();
+    }).catch(function(e){ m.textContent=failText(e); m.className='msg bad'; }).then(function(){ b.disabled=false; });
+  });
+  function gThumb(id){ return 'https://drive.google.com/thumbnail?id='+encodeURIComponent(id)+'&sz=w600'; }
+  function gWhen(at){ var t=new Date(at); return isNaN(t)?'':(t.getMonth()+1)+'/'+t.getDate()+' '+('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2); }
+  function gMapInit(){
+    if(G.map||!window.L) { if(!window.L) $('gmap').innerHTML='<p class="hint" style="padding:14px">지도를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.</p>'; return; }
+    G.map=L.map('gmap',{scrollWheelZoom:false}).setView([35.0545,129.0845],15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(G.map);
+    G.layer=L.layerGroup().addTo(G.map);
+  }
+  function gRender(){
+    var al=$('album');
+    if(!G.items.length){ al.innerHTML='<p class="hint">아직 남긴 글이 없어요. 첫 번째로 남겨 보세요!</p>'; }
+    else al.innerHTML=G.items.map(function(it,i){
+      return '<figure class="pol" data-gi="'+i+'">'+(it.kind==='질문'?'<span class="q">질문</span>':'')+
+        '<div class="ph">'+(it.img?'<img src="'+gThumb(it.img)+'" alt="'+esc(it.team)+'의 사진" loading="lazy" referrerpolicy="no-referrer">':(it.kind==='질문'?'❓':'📝'))+'</div>'+
+        '<div class="tx">'+esc(it.text)+'</div><div class="mt"><span>'+esc(it.team)+'</span><span>'+gWhen(it.at)+(it.lat!=null?' · 📍':'')+'</span></div></figure>';
+    }).join('');
+    if(!G.map) return;
+    G.layer.clearLayers(); G.markers={}; var pts=[];
+    G.items.forEach(function(it,i){
+      if(it.lat==null||it.lng==null||!isFinite(it.lat)) return;
+      var mk=L.circleMarker([it.lat,it.lng],{radius:9,weight:2,color:'#fff',fillColor:it.kind==='질문'?'#d8752a':'#2d7dd2',fillOpacity:.95});
+      mk.bindPopup('<div style="max-width:180px">'+(it.img?'<img src="'+gThumb(it.img)+'" referrerpolicy="no-referrer" style="width:100%;border-radius:3px;margin-bottom:4px">':'')+'<b>'+esc(it.team)+'</b>'+(it.kind==='질문'?' · 질문':'')+'<br>'+esc(it.text)+'</div>');
+      mk.addTo(G.layer); G.markers[i]=mk; pts.push([it.lat,it.lng]);
+    });
+    if(pts.length) G.map.fitBounds(pts,{padding:[30,30],maxZoom:17});
+  }
+  function gLoad(){
+    if(!SUBMIT_URL){ $('album').innerHTML='<p class="hint">선생님 수집 창구가 아직 준비 중이에요.</p>'; return; }
+    fetch(SUBMIT_URL+'?action=guestbook').then(function(r){ return r.json(); }).then(function(j){
+      if(!j||!j.ok) throw new Error('fail'); G.items=j.items||[]; gRender();
+    }).catch(function(){ $('album').innerHTML='<p class="hint">방명록을 불러오지 못했어요. 새로고침을 눌러 주세요.</p>'; });
+  }
+  $('album').addEventListener('click',function(e){ var c=e.target.closest('[data-gi]'); if(!c) return; var mk=G.markers[+c.dataset.gi]; if(mk&&G.map){ $('gmap').scrollIntoView({block:'center'}); G.map.setView(mk.getLatLng(),17); mk.openPopup(); } });
+  $('gReload').addEventListener('click',gLoad);
+  function openGuest(){ gMapInit(); setTimeout(function(){ if(G.map) G.map.invalidateSize(); },60); gIdbGet(); if(G.lat==null) gLocate(true); gLoad(); }
 
   /* ---- 선생님께 보내기 ---- */
   function hhmm(){ var t=new Date(); return ('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2); }
