@@ -455,6 +455,8 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
   </ul>
   <h3>우리 조의 제안 메모</h3>
   <textarea id="hearingNote" placeholder="우리 조의 역할, 고른 제안, 현장 증거 2개"></textarea>
+  <div class="actions"><button type="button" class="primary" id="sendResultBtn">📤 우리 조 결과를 선생님께 보내기</button><span class="msg" id="sendStatus"></span></div>
+  <p class="hint">최종 보고와 보고서 복원을 제출하면 결과가 자동으로 전송돼요. 공청회 메모까지 쓴 뒤 한 번 더 보내 주세요.</p>
   <p class="reset">새 조가 이 폰으로 처음부터 시작해야 하면 <button class="ghost small" id="resetBtn">수첩 초기화</button> <span id="resetConfirm" hidden><button class="primary small" id="resetYes">정말 지우기</button> <button class="ghost small" id="resetNo">취소</button></span></p>
 </section>
 
@@ -500,7 +502,7 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
           clue:['타임랩스 캡처','고하늘의 영상 화면. 전망대 난간 너머 남동쪽 수평선이 찍혀 있고, 화면 구석 시계는 10:12에서 10:48까지 흘러간다. 보고서가 사라진 시간에 고하늘은 전망대에 있었다.'], clueImg:{src:'tsushima.jpg', rec:'● REC  고하늘 TIMELAPSE', time:'10:12 → 10:48'}},
     ma1:{who:'ma', n:1, puzzle:'🗺 3번 탭의 태종대 위치도', q:'위치도에서 A 전망대 자리를 찾고, 전망대 난간에서 양옆 해안선이 어떻게 뻗어 있는지 직접 보라. 전망대는 바다 쪽으로 튀어나온 땅 끝에 있을까, 바다가 쑥 들어온 곳에 있을까? 이런 지형의 이름은?', type:'한글 1자', ans:['곶'], hint:'양옆 해안선이 뒤로 물러나 있다면, 내가 선 곳은 튀어나온 땅이에요.',
           clue:['감지 오션데크 카페 전단','"바다 위를 걷는 카페! 2단계 데크 공사 후 오픈. 공청회 통과 즉시 착공"']},
-    go2:{who:'go', n:2, photo:'등대 안내판 사진', q:'사진 속 안내판을 찾아라. 영도등대가 처음 불을 밝힌 해는?', type:'숫자 4자리', ans:['1906'], hint:'안내판의 연혁 부분을 보세요. 1900년대 초입니다.',
+    go2:{who:'go', n:2, img:'sign.jpg', photo:'영도등대 안내판 · 최초 점등일은 가려 두었다. 현장에서 직접 읽어라!', q:'사진 속 안내판을 찾아라. 영도등대가 처음 불을 밝힌 해는?', type:'숫자 4자리', ans:['1906'], hint:'안내판의 연혁 부분을 보세요. 1900년대 초입니다.',
           clue:['SNS 게시물','10:52 "전망대 타임랩스 완성!" 위치 태그: 태종대 전망대']},
     seok1:{who:'seok', n:1, photo:'등대 아래 절벽 밑동 확대 사진', q:'움푹 파인 홈을 만든 범인은? (이 홈이 깊어지면 절벽은 어느 쪽으로 물러날지도 생각해보자)', type:'한글 2자', ans:['파도'], hint:'바닷물이 절벽 밑동에 계속 부딪히는 것은?',
           clue:['영도등대 방명록','"10:35 석무진 — 절벽 밑동 촬영 목적"']},
@@ -534,6 +536,8 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
     {id:'m_seok', t:'정비 전 측량 자료를 먼저 논문에 쓰려고'}
   ];
   var CULPRIT='ma', MOTIVE='m_ma', DECISIVE=['ma2','ma3','verify'];
+  /* 선생님 수집 창구: Apps Script 웹 앱 URL을 넣으세요 (비워두면 제출 버튼이 '준비 중'으로 표시) */
+  var SUBMIT_URL='';
 
   var REPORT_PARTS = [
     {key:'a1',num:'①',title:'돌이 태어나는 곳',place:'전망대',text:'태종대는 대한해협 쪽으로 튀어나온 {b1} 지형이다. 막아주는 섬이 없어서 큰 파도가 곧장 부딪힌다. 수평선 너머 {b2} 방향에는 대마도가 있고, 그 사이에는 눈에 보이지 않는 나라의 경계가 있다.',hint:'전망대에서 지도 앱과 나침반으로 확인한 것을 떠올려 보세요.'},
@@ -664,6 +668,8 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
     var b=e.target.closest('button'); if(!b) return;
     if(b.dataset.shot){ pickPhoto(b.dataset.shot); return; }
     if(b.dataset.draw){ openEditor(b.dataset.draw); return; }
+    if(b.dataset.savephoto){ savePhotoFile(b.dataset.savephoto); return; }
+    if(b.dataset.sendphoto){ sendPhoto(b.dataset.sendphoto, b); return; }
     if(b.dataset.delshot){ var dc=b.dataset.delshot; if(b.dataset.sure){ delete PHOTOS[dc]; savePhotos(); rerender(); } else { b.dataset.sure='1'; b.textContent='정말 삭제'; } return; }
     if(b.dataset.check){ check(b.dataset.check); }
     else if(b.dataset.hint){ S.hint[b.dataset.hint]=true; save(); rerender(); }
@@ -727,7 +733,7 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
       $('fconfirm').innerHTML='<div class="hintbox" style="margin-top:10px">한 번 제출하면 바꿀 수 없어요. <button type="button" class="primary small" id="finalYes">제출할게요</button> <button type="button" class="ghost small" id="finalNo">다시 볼게요</button></div>';
     }
     if(b.id==='finalNo') $('fconfirm').innerHTML='';
-    if(b.id==='finalYes'){ S.final.done=true; S.final.at=Date.now(); save(); refreshScore(); renderFinal(); refreshTabs(); window.scrollTo({top:0}); }
+    if(b.id==='finalYes'){ S.final.done=true; S.final.at=Date.now(); save(); refreshScore(); renderFinal(); refreshTabs(); window.scrollTo({top:0}); sendResult('최종 수사 보고'); }
   });
   function endingHtml(){
     var F=S.final, caught=F.suspect===CULPRIT, mot=F.motive===MOTIVE;
@@ -789,7 +795,7 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
       story=[['몽돌이','"거의 다 왔어요! 그런데 공청회에서 마도윤 씨가 손을 들었어요."'],['마도윤','"「'+wrong.map(function(a){return a.p.title}).join('」, 「')+'」 부분은 틀렸잖소. 이런 보고서를 믿으라고?"'],['한바다','"틀린 부분만 다시 확인하면 돼요. 표시된 영역을 고쳐서 다시 제출해 주세요."']];}
     else{st.textContent='복원 실패';st.classList.remove('done');ss.textContent='훼손 심함';kind='bad';badge='📂 미완성 엔딩';title='공청회가 연기되었다';
       story=[['몽돌이','"보고서에 빈 구멍이 너무 많아요. 이대로는 발표할 수 없대요."'],['한바다','"괜찮아요. 수사 수첩과 단서 카드를 다시 펼쳐 보세요. 답은 전부 현장에 있었어요."']];}
-    S.rDone=perfect; save(); refreshTabs();
+    S.rDone=perfect; S.lastReport=right+'/'+total; save(); refreshTabs(); sendResult('보고서 복원');
     var obs=$('b14').value;
     $('rresult').innerHTML='<div class="ending"><div class="eyebrow">복원 결과</div><h3>'+esc(title)+'</h3><span class="badge '+kind+'">'+esc(badge)+'</span>'+
       '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:12px"><span class="big">'+right+'</span><span class="hint">/ '+total+' 칸 정답</span></div>'+
@@ -870,7 +876,9 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
     return '<div class="shot'+(s.key?' key':'')+'"><div class="st"><span>📸 현장 채증 · 사진 위에 선 긋기</span>'+(P&&P.strokes&&P.strokes.length?'<span class="msg ok">선 '+P.strokes.length+'개</span>':'')+'</div>'+
       '<p class="sp">'+esc(s.shot)+'</p>'+LEGEND+
       (P ? '<div class="thumb"><img src="'+P.src+'" alt="'+esc(s.name)+'에서 찍은 사진"><span>'+overlaySVG(P.strokes)+'</span></div>'+
-           '<div class="shotbtns"><button type="button" class="primary small" data-draw="'+code+'">선 긋기 / 고치기</button><button type="button" class="ghost small" data-shot="'+code+'">사진 다시 찍기</button><button type="button" class="ghost small" data-delshot="'+code+'">삭제</button></div>'
+           '<div class="shotbtns"><button type="button" class="primary small" data-draw="'+code+'">선 긋기 / 고치기</button><button type="button" class="ghost small" data-shot="'+code+'">사진 다시 찍기</button><button type="button" class="ghost small" data-delshot="'+code+'">삭제</button></div>'+
+           '<div class="shotbtns" style="margin-top:8px"><button type="button" class="ghost small" data-savephoto="'+code+'">💾 사진 저장</button><button type="button" class="primary small" data-sendphoto="'+code+'">📤 선생님께 제출</button></div>'+
+           '<div class="msg'+(S.sent&&S.sent[code]?' ok':'')+'" id="sendmsg-'+code+'">'+(S.sent&&S.sent[code]?'제출 완료 · '+S.sent[code]:'')+'</div>'
          : '<div class="shotbtns" style="margin-top:8px"><button type="button" class="primary small" data-shot="'+code+'">📸 사진 찍기</button></div>')+
       '</div>';
   }
@@ -932,6 +940,61 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
   $('drawDone').addEventListener('click',function(){ PHOTOS[ED.code].strokes=ED.strokes; savePhotos(); closeEditor(); rerender(); var t=document.querySelector('[data-draw="'+ED.code+'"]'); if(t) t.scrollIntoView({block:'center'}); });
   window.addEventListener('resize',function(){ if(!$('drawer').hidden){ fitCanvas(); redraw(); } });
   document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!$('drawer').hidden) closeEditor(); });
+
+  /* ---- 선생님께 보내기 ---- */
+  function hhmm(){ var t=new Date(); return ('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2); }
+  function siteBy(code){ return SITES.filter(function(s){return s.code.charAt(0)===code})[0]; }
+  function needTeam(){ if((S.team||'').trim()) return false; show('intro'); setTimeout(function(){ var t=$('team'); t.focus(); t.scrollIntoView({block:'center'}); },50); return true; }
+  function composite(code){
+    return new Promise(function(res,rej){
+      var P=PHOTOS[code], im=new Image();
+      im.onload=function(){
+        var W=im.naturalWidth,H=im.naturalHeight,bar=Math.max(36,Math.round(W*0.055)),c=document.createElement('canvas'); c.width=W; c.height=H+bar;
+        var g=c.getContext('2d'); g.drawImage(im,0,0,W,H); (P.strokes||[]).forEach(function(st){ drawStroke(g,st,W,H); });
+        g.fillStyle='#1c2a2e'; g.fillRect(0,H,W,bar); g.fillStyle='#ffffff'; g.textBaseline='middle';
+        g.font='600 '+Math.round(bar*0.42)+'px "Apple SD Gothic Neo","Malgun Gothic",sans-serif';
+        g.fillText((S.team||'수사팀')+' · '+code+' '+siteBy(code).name+' · 선 '+(P.strokes||[]).length+'개 · '+hhmm(), Math.round(bar*0.35), H+bar/2);
+        res(c.toDataURL('image/jpeg',0.85));
+      };
+      im.onerror=rej; im.src=P.src;
+    });
+  }
+  function savePhotoFile(code){
+    composite(code).then(function(url){
+      var a=document.createElement('a'); a.href=url; a.download=(S.team||'수사팀')+'_'+code+'_'+siteBy(code).name+'.jpg';
+      document.body.appendChild(a); a.click(); a.remove();
+      var m=$('sendmsg-'+code); if(m){ m.textContent='사진을 저장했어요. 저장이 안 되면 사진을 길게 눌러 저장하세요.'; m.className='msg ok'; }
+    });
+  }
+  function post(payload){
+    if(!SUBMIT_URL) return Promise.reject(new Error('nourl'));
+    return fetch(SUBMIT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)})
+      .then(function(r){ return r.json(); }).then(function(j){ if(!j||!j.ok) throw new Error((j&&j.error)||'fail'); return j; });
+  }
+  function failText(e){ return e&&e.message==='nourl' ? '선생님 수집 창구가 아직 준비 중이에요. 사진 저장을 먼저 해 두세요.' : '보내지 못했어요. 데이터 연결을 확인하고 다시 눌러 주세요.'; }
+  function sendPhoto(code,btn){
+    if(needTeam()) return;
+    var m=$('sendmsg-'+code); btn.disabled=true; m.textContent='보내는 중…'; m.className='msg';
+    composite(code).then(function(url){
+      return post({type:'photo',team:S.team,site:code,siteName:code+' '+siteBy(code).name,lines:(PHOTOS[code].strokes||[]).length,image:url});
+    }).then(function(){
+      S.sent=S.sent||{}; S.sent[code]=hhmm(); save(); m.textContent='제출 완료 · '+S.sent[code]; m.className='msg ok';
+    }).catch(function(e){ m.textContent=failText(e); m.className='msg bad'; }).then(function(){ btn.disabled=false; });
+  }
+  function evName(id){ return id==='verify'?'감지해변 진술 대조':(PINS[id]?PINS[id].clue[0]:id); }
+  function sendResult(kind){
+    var F=S.final, st=$('sendStatus');
+    var mot=F.motive?(MOTIVES.filter(function(x){return x.id===F.motive})[0]||{}).t:'';
+    var payload={type:'result',team:S.team,kind:kind,score:score(),grade:grade(score()),
+      solved:Object.keys(S.solved).length+'/12',hints:Object.keys(S.hint).length,reveals:Object.keys(S.reveal).length,
+      suspect:F.done&&F.suspect?SUSPECTS[F.suspect].name:'',motive:F.done?mot:'',evidence:(F.done&&F.evidence||[]).map(evName),
+      report:S.lastReport||'',reportAttempts:S.rAttempts||'',observed:(S.report&&S.report.b14)||'',
+      conclusion:(S.report&&S.report.concl)||'',hearing:S.hearing||''};
+    if(st){ st.textContent='보내는 중…'; st.className='msg'; }
+    return post(payload).then(function(){ S.sentResult=hhmm(); save(); if(st){ st.textContent=kind+' 결과 전송 완료 · '+S.sentResult; st.className='msg ok'; } })
+      .catch(function(e){ if(st){ st.textContent=failText(e); st.className='msg bad'; } });
+  }
+  $('sendResultBtn').addEventListener('click',function(){ if(needTeam()) return; sendResult('공청회 메모 포함'); });
 
   rerender(); refreshTabs();
   idbOpen().then(function(db){ IDB=db; return loadPhotos(); }).then(function(){ rerender(); });
