@@ -17,7 +17,7 @@
 
 const FOLDER_NAME = '태종대 지오 사건파일 · 학생 사진';
 const PHOTO_HEAD = ['받은 시각', '수사팀', '거점', '선 개수', '사진 보기', '파일 ID'];
-const GUEST_HEAD = ['받은 시각', '수사팀', '종류', '글', '위도', '경도', '사진 보기', '파일 ID', '숨기기(X)'];
+const GUEST_HEAD = ['받은 시각', '수사팀', '종류', '글', '위도', '경도', '사진 보기', '파일 ID', '숨기기(X)', '글 ID', '삭제 키'];
 const RESULT_HEAD = ['받은 시각', '수사팀', '보낸 시점', '총점', '등급', '푼 핀', '힌트 사용', '정답 보기',
                      '지목한 범인', '고른 동기', '고른 증거', '보고서 점수', '보고서 제출 횟수', '관찰한 둔덕', '결론', '공청회 메모'];
 
@@ -36,10 +36,10 @@ function doGet(e) {
     if (!sh || sh.getLastRow() < 2) return json_({ ok: true, items: [] });
     const rows = sh.getRange(2, 1, sh.getLastRow() - 1, GUEST_HEAD.length).getValues();
     const items = rows
-      .filter(function (r) { return String(r[8]).trim().toUpperCase() !== 'X'; })
+      .filter(function (r) { return String(r[8]).trim().toUpperCase().indexOf('X') !== 0; })
       .map(function (r) {
         return { at: r[0] instanceof Date ? r[0].getTime() : r[0], team: r[1], kind: r[2], text: r[3],
-                 lat: r[4] === '' ? null : Number(r[4]), lng: r[5] === '' ? null : Number(r[5]), img: r[7] || '' };
+                 lat: r[4] === '' ? null : Number(r[4]), lng: r[5] === '' ? null : Number(r[5]), img: r[7] || '', id: r[9] || '' };
       })
       .reverse().slice(0, 150);
     return json_({ ok: true, items: items });
@@ -79,8 +79,23 @@ function doPost(e) {
       }
       const lat = Number(d.lat), lng = Number(d.lng);
       sheet_(ss, '방명록', GUEST_HEAD).appendRow([now, team, d.kind === '질문' ? '질문' : '방명록', text,
-        isFinite(lat) && d.lat !== null ? lat : '', isFinite(lng) && d.lng !== null ? lng : '', url, id, '']);
+        d.lat != null && isFinite(lat) ? lat : '', d.lng != null && isFinite(lng) ? lng : '', url, id, '',
+        clean_(d.gid, 40), clean_(d.key, 60)]);
       return json_({ ok: true });
+    }
+
+    if (d.type === 'guestDel') {
+      const sh = ss.getSheetByName('방명록');
+      if (!sh || sh.getLastRow() < 2) return json_({ ok: false, error: '글을 찾지 못했어요' });
+      const rows = sh.getRange(2, 1, sh.getLastRow() - 1, GUEST_HEAD.length).getValues();
+      for (let i = 0; i < rows.length; i++) {
+        if (String(rows[i][9]) === String(d.id)) {
+          if (!d.key || String(rows[i][10]) !== String(d.key)) return json_({ ok: false, error: '내가 쓴 글만 지울 수 있어요' });
+          sh.getRange(i + 2, 9).setValue('X(학생 삭제)');
+          return json_({ ok: true });
+        }
+      }
+      return json_({ ok: false, error: '글을 찾지 못했어요' });
     }
 
     if (d.type === 'result') {
@@ -106,8 +121,9 @@ function sheet_(ss, name, head) {
     sh = ss.insertSheet(name);
     sh.appendRow(head);
     sh.setFrozenRows(1);
-    sh.getRange(1, 1, 1, head.length).setFontWeight('bold').setBackground('#e9efeb');
   }
+  if (sh.getLastColumn() < head.length) sh.getRange(1, 1, 1, head.length).setValues([head]);
+  sh.getRange(1, 1, 1, head.length).setFontWeight('bold').setBackground('#e9efeb');
   return sh;
 }
 

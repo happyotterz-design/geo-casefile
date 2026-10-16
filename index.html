@@ -246,6 +246,8 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
 .pol .ph img{width:100%;height:100%;object-fit:cover;display:block}
 .pol .tx{font-family:'Nanum Pen Script',cursive;font-size:21px;line-height:1.15;color:#2b3f73;margin:8px 2px 4px;word-break:keep-all;overflow-wrap:anywhere}
 .pol .mt{font-size:11.5px;color:var(--ink-soft);display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap}
+.gdel{margin-top:8px;width:100%;background:transparent;border:1px solid var(--rule);border-radius:3px;font-size:12.5px;color:var(--ink-soft);padding:4px 0}
+label.gloc{font-family:var(--body);font-size:14px;color:var(--ink);cursor:pointer}label.gloc input{width:18px;height:18px;margin:0}
 .pol .q{position:absolute;top:12px;right:12px;background:#d8752a;color:#fff;font-size:11.5px;font-weight:700;border-radius:999px;padding:1px 8px}
 .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:8px 0 16px}
 .gallery figure{margin:0}
@@ -570,7 +572,7 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
     <div class="gprev" id="gPrev">사진은 선택이에요</div>
     <div class="shotbtns"><button type="button" class="ghost small" id="gPhotoBtn">📷 사진 찍기 / 고르기</button><button type="button" class="ghost small" id="gPhotoDel" hidden>사진 빼기</button></div>
     <textarea id="gText" maxlength="120" placeholder="예: 신선바위가 바다보다 높은 게 신기했다! / 이안제가 생기면 자갈은 어디로 가나요?"></textarea>
-    <div class="gloc"><button type="button" class="ghost small" id="gLocBtn">📍 지금 위치 넣기</button><span id="gLoc">위치 없음</span></div>
+    <label class="gloc"><input type="checkbox" id="gLocOn"> 📍 지금 위치도 함께 남기기 (지도에 핀이 꽂혀요)</label><div class="gloc" id="gLocRow" hidden><span id="gLoc">위치 없음</span><button type="button" class="ghost small" id="gLocBtn">다시 찾기</button></div>
     <div class="actions"><button type="button" class="primary" id="gSend">📤 방명록에 남기기</button><span class="msg" id="gMsg"></span></div>
   </div>
   <h2>방명록 지도</h2>
@@ -1179,13 +1181,14 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
 
   /* ---- 8 방명록 ---- */
   var G={kind:'방명록',img:null,lat:null,lng:null,map:null,layer:null,items:[],markers:{}};
-  S.gdraft=S.gdraft||{};
+  S.gdraft=S.gdraft||{}; S.gmine=S.gmine||[];
+  if(!S.gkey){ S.gkey=Math.random().toString(36).slice(2)+Date.now().toString(36); save(); }
   if(S.gdraft.text) $('gText').value=S.gdraft.text;
   if(S.gdraft.kind) G.kind=S.gdraft.kind;
-  if(S.gdraft.lat!=null){ G.lat=S.gdraft.lat; G.lng=S.gdraft.lng; }
-  function gSaveDraft(){ S.gdraft={text:$('gText').value,kind:G.kind,lat:G.lat,lng:G.lng}; save(); }
+  G.locOn=!!S.gdraft.locOn; if(G.locOn&&S.gdraft.lat!=null){ G.lat=S.gdraft.lat; G.lng=S.gdraft.lng; }
+  function gSaveDraft(){ S.gdraft={text:$('gText').value,kind:G.kind,locOn:G.locOn,lat:G.lat,lng:G.lng}; save(); }
   function gKindUI(){ document.querySelectorAll('[data-gkind]').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.gkind===G.kind?'true':'false'); }); $('gSend').textContent=G.kind==='질문'?'📤 질문 남기기':'📤 방명록에 남기기'; }
-  function gLocUI(){ $('gLoc').textContent = G.lat!=null ? G.lat.toFixed(5)+', '+G.lng.toFixed(5) : '위치 없음'; }
+  function gLocUI(){ $('gLocOn').checked=G.locOn; $('gLocRow').hidden=!G.locOn; $('gLoc').textContent = G.lat!=null ? G.lat.toFixed(5)+', '+G.lng.toFixed(5) : '위치 없음'; }
   function gPrevUI(){ var b=$('gPrev'); if(G.img){ b.innerHTML='<img src="'+G.img+'" alt="남길 사진">'; $('gPhotoDel').hidden=false; } else { b.textContent='사진은 선택이에요'; $('gPhotoDel').hidden=true; } }
   gKindUI(); gLocUI();
   document.querySelectorAll('[data-gkind]').forEach(function(b){ b.addEventListener('click',function(){ G.kind=b.dataset.gkind; gKindUI(); gSaveDraft(); }); });
@@ -1198,7 +1201,6 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
       var k=Math.min(1,1000/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');
       c.width=Math.round(im.naturalWidth*k); c.height=Math.round(im.naturalHeight*k); c.getContext('2d').drawImage(im,0,0,c.width,c.height);
       G.img=c.toDataURL('image/jpeg',.8); gPrevUI(); gIdbPut(G.img);
-      if(G.lat==null) gLocate(true);
     }; im.src=rd.result; }; rd.readAsDataURL(f);
   });
   function gIdbPut(v){ if(!IDB) return; try{ IDB.transaction('kv','readwrite').objectStore('kv').put(v,'guestPhoto'); }catch(e){} }
@@ -1206,17 +1208,20 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
   function gLocate(quiet){
     if(!navigator.geolocation){ if(!quiet) $('gLoc').textContent='이 기기는 위치를 지원하지 않아요'; return; }
     $('gLoc').textContent='위치 찾는 중…';
-    navigator.geolocation.getCurrentPosition(function(pos){ G.lat=pos.coords.latitude; G.lng=pos.coords.longitude; gLocUI(); gSaveDraft(); },
+    navigator.geolocation.getCurrentPosition(function(pos){ if(!G.locOn) return; G.lat=pos.coords.latitude; G.lng=pos.coords.longitude; gLocUI(); gSaveDraft(); },
       function(){ gLocUI(); if(!quiet) $('gLoc').textContent='위치를 못 가져왔어요 (위치 권한을 허용해 주세요)'; },
       {enableHighAccuracy:true,timeout:15000,maximumAge:60000});
   }
   $('gLocBtn').addEventListener('click',function(){ gLocate(false); });
+  $('gLocOn').addEventListener('change',function(){ G.locOn=this.checked; if(G.locOn){ gLocUI(); gLocate(false); } else { G.lat=null; G.lng=null; gLocUI(); } gSaveDraft(); });
   $('gSend').addEventListener('click',function(){
     var m=$('gMsg'), t=$('gText').value.trim();
     if(!t){ m.textContent='한 줄이라도 적어 주세요.'; m.className='msg bad'; $('gText').focus(); return; }
     if(needTeam(m)) return;
     var b=this; b.disabled=true; m.textContent='남기는 중…'; m.className='msg';
-    post({type:'guest',team:S.team,kind:G.kind,text:t,lat:G.lat,lng:G.lng,image:G.img||''}).then(function(){
+    var gid='g'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    post({type:'guest',team:S.team,kind:G.kind,text:t,lat:G.locOn?G.lat:null,lng:G.locOn?G.lng:null,image:G.img||'',gid:gid,key:S.gkey}).then(function(){
+      S.gmine.push(gid); save();
       $('gText').value=''; G.img=null; gPrevUI(); gIdbPut(null); gSaveDraft();
       m.textContent='남겼어요! 앨범에 붙었어요.'; m.className='msg ok'; gLoad();
     }).catch(function(e){ m.textContent=failText(e); m.className='msg bad'; }).then(function(){ b.disabled=false; });
@@ -1235,7 +1240,8 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
     else al.innerHTML=G.items.map(function(it,i){
       return '<figure class="pol" data-gi="'+i+'">'+(it.kind==='질문'?'<span class="q">질문</span>':'')+
         '<div class="ph">'+(it.img?'<img src="'+gThumb(it.img)+'" alt="'+esc(it.team)+'의 사진" loading="lazy" referrerpolicy="no-referrer">':(it.kind==='질문'?'❓':'📝'))+'</div>'+
-        '<div class="tx">'+esc(it.text)+'</div><div class="mt"><span>'+esc(it.team)+'</span><span>'+gWhen(it.at)+(it.lat!=null?' · 📍':'')+'</span></div></figure>';
+        '<div class="tx">'+esc(it.text)+'</div><div class="mt"><span>'+esc(it.team)+'</span><span>'+gWhen(it.at)+(it.lat!=null?' · 📍':'')+'</span></div>'+
+        (it.id&&S.gmine.indexOf(it.id)>-1?'<button type="button" class="gdel" data-gdel="'+esc(it.id)+'">🗑 삭제</button>':'')+'</figure>';
     }).join('');
     if(!G.map) return;
     G.layer.clearLayers(); G.markers={}; var pts=[];
@@ -1253,9 +1259,16 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
       if(!j||!j.ok) throw new Error('fail'); G.items=j.items||[]; gRender();
     }).catch(function(){ $('album').innerHTML='<p class="hint">방명록을 불러오지 못했어요. 새로고침을 눌러 주세요.</p>'; });
   }
-  $('album').addEventListener('click',function(e){ var c=e.target.closest('[data-gi]'); if(!c) return; var mk=G.markers[+c.dataset.gi]; if(mk&&G.map){ $('gmap').scrollIntoView({block:'center'}); G.map.setView(mk.getLatLng(),17); mk.openPopup(); } });
+  $('album').addEventListener('click',function(e){
+    var d=e.target.closest('[data-gdel]');
+    if(d){ e.stopPropagation(); var ok=true; try{ ok=window.confirm('이 글을 지울까요? 지우면 앨범과 지도에서 사라져요.'); }catch(x){}
+      if(!ok) return; d.disabled=true; d.textContent='지우는 중…';
+      post({type:'guestDel',id:d.dataset.gdel,key:S.gkey}).then(function(){ S.gmine=S.gmine.filter(function(x){return x!==d.dataset.gdel}); save(); gLoad(); })
+        .catch(function(err){ d.disabled=false; d.textContent='🗑 삭제'; var m=$('gMsg'); m.textContent=failText(err); m.className='msg bad'; });
+      return; }
+    var c=e.target.closest('[data-gi]'); if(!c) return; var mk=G.markers[+c.dataset.gi]; if(mk&&G.map){ $('gmap').scrollIntoView({block:'center'}); G.map.setView(mk.getLatLng(),17); mk.openPopup(); } });
   $('gReload').addEventListener('click',gLoad);
-  function openGuest(){ gMapInit(); setTimeout(function(){ if(G.map) G.map.invalidateSize(); },60); gIdbGet(); if(G.lat==null) gLocate(true); gLoad(); }
+  function openGuest(){ gMapInit(); setTimeout(function(){ if(G.map) G.map.invalidateSize(); },60); gIdbGet(); gLocUI(); if(G.locOn&&G.lat==null) gLocate(true); gLoad(); }
 
   /* ---- 선생님께 보내기 ---- */
   function hhmm(){ var t=new Date(); return ('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2); }
