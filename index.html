@@ -111,6 +111,7 @@ td.num{font-family:var(--mono);white-space:nowrap;font-variant-numeric:tabular-n
 .pin-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 10px;align-items:center}
 .pin-name{font-weight:700;font-size:14.5px}
 .atype{font-family:var(--mono);font-size:12px;border:1px solid var(--ink-soft);border-radius:3px;padding:1px 7px;color:var(--ink-soft)}
+.photo.teach{text-align:left;margin-bottom:8px;line-height:1.55}.photo.teach ul{margin:6px 0 0;padding-left:18px}.photo.teach li{margin:3px 0}
 .photo{border:1.5px dashed var(--rule);border-radius:3px;background:repeating-linear-gradient(45deg,var(--paper-2),var(--paper-2) 8px,var(--paper) 8px,var(--paper) 16px);font-size:12.5px;color:var(--ink-soft);padding:14px;text-align:center}
 .q{margin:0;font-size:15px}
 .ansrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
@@ -275,7 +276,8 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
     <label for="team" style="font-weight:600">수사팀</label>
     <input id="team" class="teaminp" type="text" placeholder="예: 2학년 3반 4조" autocomplete="off">
   </div>
-  <p class="hint">조별로 이 수첩 하나를 함께 씁니다. 기록은 이 폰에 저장돼요.</p>
+  <p class="hint">조별로 이 수첩 하나를 함께 씁니다. 입력하는 순간 이 폰에 자동 저장돼서, 화면을 끄거나 다른 앱·페이지에 다녀와도 같은 휴대폰·같은 브라우저로 다시 열면 그대로 이어져요. 단, 시크릿(비공개) 탭에서는 저장되지 않아요.</p>
+  <p class="msg bad" id="storeWarn" hidden>⚠ 이 브라우저는 기록을 저장할 수 없어요(시크릿 모드일 수 있어요). 일반 탭에서 다시 열어 주세요.</p>
 
   <h2>이 수사가 특별한 이유</h2>
   <p><b>지형을 외우는 대신, 현장에서 증거로 읽는다.</b> 해식애, 파식대, 자갈 해빈은 교과서의 용어가 아니라 태종대에 실제로 남아 있는 흔적이다.</p>
@@ -510,7 +512,15 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
           clue:['통제선 앞 지질 망치',"손잡이에 '석무진' 이름표. 쇠 부분이 붉게 녹슬었다."]},
     go3:{who:'go', n:3, img:'sinseon.jpg', photo:'신선바위의 평평한 면과 바닷물 (출처: 부산국가지질공원)', q:'신선바위의 평평한 면과 지금 바닷물의 높이를 비교하라. 파도가 깎은 평원인데, 바닷물보다 ( 높다 / 낮다 ).', type:'한글 2자', ans:['높다','높음','높아'], hint:'파도가 쳐도 평소엔 잠기지 않아요.',
           clue:['보고서 조각 p.7','"훼손 사례: 2025년 통제선 무단 진입 촬영 (유튜버 G씨)"']},
-    ma2:{who:'ma', n:2, puzzle:'🔍 사건 현장 사진 + 배치도', q:'키트의 사건 현장 사진과 눈앞의 쉼터를 비교하라. 사진에만 있는 물건 2개를 찾아, 배치도에서 그 자리의 번호를 작은 수부터 붙여 쓰시오.', type:'숫자 2자리', ans:['37'], hint:'벤치 아래와 나무 옆을 잘 보세요.',
+    ma2:{who:'ma', n:2, puzzle:'🔍 사건 현장 사진 + 배치도',
+          teach:[['사진 1 · 사건 현장 사진 (선생님용)',[
+            '태종사 쪽 쉼터를 정면에서 3~4m 떨어져 가로로 찍는다. 벤치, 나무, 표지판·휴지통 같은 고정물이 한 장에 모두 들어가고 사람은 없게.',
+            '실제 쉼터에는 없는 물건 2개가 이 사진에만 있어야 한다. ③ 벤치 아래: 둘둘 말린 설계도 종이 귀퉁이(파란 도면 선과 「2단계」 글자 일부). ⑦ 나무 옆 땅: 동글동글한 바닷가 자갈 1개(산길에는 없는 둥근 자갈).',
+            '합성할 필요 없이, 현장에서 설계도 인쇄물과 자갈을 그 자리에 놓고 찍은 뒤 치우면 된다. 원래 있던 물건(휴지통, 표지판, 낙엽 등)은 그대로 둬서 헷갈리게 한다.']],
+            ['사진 2 · 배치도 (선생님용)',[
+            '쉼터를 위에서 내려다본 단순한 그림에 물건이 놓일 만한 자리 8곳을 ①~⑧로 표시한다.',
+            '예시: ① 입구 표지판 ② 벤치 왼쪽 끝 ③ 벤치 아래 ④ 벤치 오른쪽 끝 ⑤ 휴지통 ⑥ 계단 ⑦ 나무 옆 ⑧ 난간. 실제 모양에 맞게 옮겨도 되지만 ③ 벤치 아래, ⑦ 나무 옆은 유지한다(정답 37, 감식 결과 단서와 연결).',
+            '사진 1을 보내 주면 배치도는 그려서 넣어 준다.']]], q:'키트의 사건 현장 사진과 눈앞의 쉼터를 비교하라. 사진에만 있는 물건 2개를 찾아, 배치도에서 그 자리의 번호를 작은 수부터 붙여 쓰시오.', type:'숫자 2자리', ans:['37'], hint:'벤치 아래와 나무 옆을 잘 보세요.',
           clue:['현장 감식 결과',"③번 자리: '감지 오션데크 2단계 조감도' 설계도 귀퉁이 / ⑦번 자리: 둥근 자갈 1개"]},
     oh1:{who:'oh', n:1, photo:'현장에 떨어진 둥근 돌 사진', q:'현장의 둥근 돌과 쉼터 주변 숲길의 돌을 비교하라. 현장의 돌은 ( 산 / 바다 )에서 왔다.', type:'한글 2자', ans:['바다'], hint:'숲길의 돌은 모서리가 어떤가요?',
           clue:['감식반 메모','"현장의 돌은 바다 자갈. 바닷가에서 막 걸어온 사람의 신발에 끼어 왔을 가능성"']},
@@ -537,7 +547,7 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
   ];
   var CULPRIT='ma', MOTIVE='m_ma', DECISIVE=['ma2','ma3','verify'];
   /* 선생님 수집 창구: Apps Script 웹 앱 URL을 넣으세요 (비워두면 제출 버튼이 '준비 중'으로 표시) */
-  var SUBMIT_URL='';
+  var SUBMIT_URL='https://script.google.com/macros/s/AKfycbzXw1aV-0xPfG2pOZEluIwvbfg_ycMRExgw6dlw3C2AJnNoQXkAdSIeXUWDbCodmzjv/exec';
 
   var REPORT_PARTS = [
     {key:'a1',num:'①',title:'돌이 태어나는 곳',place:'전망대',text:'태종대는 대한해협 쪽으로 튀어나온 {b1} 지형이다. 막아주는 섬이 없어서 큰 파도가 곧장 부딪힌다. 수평선 너머 {b2} 방향에는 대마도가 있고, 그 사이에는 눈에 보이지 않는 나라의 경계가 있다.',hint:'전망대에서 지도 앱과 나침반으로 확인한 것을 떠올려 보세요.'},
@@ -563,7 +573,8 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
   var S = fresh();
   function fresh(){return {team:'',solved:{},hint:{},reveal:{},notes:{},verify:{},memo:{},final:{done:false},report:{},rAttempts:0,rDone:false,hearing:'',started:Date.now()}}
   try{var raw=localStorage.getItem(KEY); if(raw){var d=JSON.parse(raw); for(var k in d) S[k]=d[k];}}catch(e){}
-  function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(S)); return true;}catch(e){ return false; }}
+  S.draft=S.draft||{};
   function $(id){return document.getElementById(id)}
   function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   function norm(s){return String(s||'').replace(/\s+/g,'').replace(/(년|개|줄|쪽|방향)$/,'')}
@@ -593,6 +604,7 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
     $('tb-'+name).scrollIntoView({inline:'center',block:'nearest'});
     window.scrollTo({top:0});
     try{ history.replaceState(null,'','#'+name); }catch(e){}
+    if(S.tab!==name){ S.tab=name; save(); }
   }
   document.addEventListener('click',function(e){var g=e.target.closest('[data-go]'); if(g) show(g.dataset.go);});
 
@@ -631,7 +643,7 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
   /* ---- missions ---- */
   function pinHtml(id){
     var p=PINS[id], su=SUSPECTS[p.who], solved=!!S.solved[id];
-    var media = p.img ? '<figure><img src="'+p.img+'" alt="'+esc(p.photo||'')+'" loading="lazy"><figcaption>'+esc(p.photo||'')+'</figcaption></figure>' : p.photo ?'<div class="photo">📷 '+esc(p.photo)+' · 사전답사 후 실제 사진이 들어갈 자리</div>' : (p.puzzle? '<div class="hint">'+esc(p.puzzle)+' 사용</div>':'');
+    var media = p.img ? '<figure><img src="'+p.img+'" alt="'+esc(p.photo||'')+'" loading="lazy"><figcaption>'+esc(p.photo||'')+'</figcaption></figure>' : p.photo ?'<div class="photo">📷 '+esc(p.photo)+' · 사전답사 후 실제 사진이 들어갈 자리</div>' : (p.teach? p.teach.map(function(t){ return '<div class="photo teach"><b>📷 '+esc(t[0])+'</b><ul>'+t[1].map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>'; }).join('') : p.puzzle? '<div class="hint">'+esc(p.puzzle)+' 사용</div>':'');
     var body = solved
       ? '<div class="msg ok">정답! 단서를 확보했다.'+(S.reveal[id]?' (정답 보기 사용)':'')+'</div><div class="clue"><span class="ct">'+esc(p.clue[0])+'</span>'+(p.clueImg?'<div class="recshot"><img src="'+p.clueImg.src+'" alt="고하늘 타임랩스 화면" loading="lazy"><span class="rec"><i>●</i> '+esc(p.clueImg.rec.replace('●','').trim())+'</span><span class="rtime">'+esc(p.clueImg.time)+'</span></div>':'')+esc(p.clue[1])+'</div>'
       : '<div class="ansrow"><input id="in-'+id+'" type="text" inputmode="'+(p.type.indexOf('숫자')>-1?'numeric':'text')+'" placeholder="정답 입력" autocomplete="off"><button type="button" class="primary small" data-check="'+id+'">확인</button>'+
@@ -687,6 +699,7 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
       if(t.dataset.row!==undefined){ var arr=Array.isArray(S.notes[id])?S.notes[id]:[]; arr[+t.dataset.row]=t.value; S.notes[id]=arr; } else S.notes[id]=t.value;
       save(); var d=noteDone(id); var m=$('nm-'+id); m.textContent=d?'기록 완료 +2':''; m.className='msg'+(d?' ok':''); refreshScore(); }
     if(t.id==='soundNote'){ S.verify.sound=t.value; save(); }
+    if(t.id&&t.id.indexOf('in-')===0){ S.draft[t.id.slice(3)]=t.value; save(); }
   });
   function check(id){
     var inp=$('in-'+id), v=norm(inp.value), p=PINS[id], m=$('msg-'+id);
@@ -818,7 +831,8 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
     $('tb-report').classList.toggle('lock',!S.final.done);
     $('tb-report').textContent=(S.final.done?'':'🔒 ')+'6 보고서 복원';
   }
-  function rerender(){ renderMissions(); renderMap(); refreshChips(); refreshScore(); renderPieces(); renderGallery(); }
+  function restoreDrafts(){ Object.keys(S.draft||{}).forEach(function(id){ var el=$('in-'+id); if(el&&!el.value) el.value=S.draft[id]; }); }
+  function rerender(){ renderMissions(); restoreDrafts(); renderMap(); refreshChips(); refreshScore(); renderPieces(); renderGallery(); }
 
   /* ---- report pieces ---- */
   var PV=[[60,0],[56,10],[63,20],[57,30],[64,42],[58,53],[62,64],[55,76],[63,88],[57,98],[61,106],[56,118],[64,130],[58,142],[62,152],[60,160]];
@@ -912,7 +926,7 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
     ED.img.onload=function(){ $('drawer').hidden=false; document.body.style.overflow='hidden'; fitCanvas(); redraw(); $('drawDone').focus(); };
     ED.img.src=P.src;
   }
-  function closeEditor(){ $('drawer').hidden=true; document.body.style.overflow=''; }
+  function closeEditor(){ if(S.edDraft){ delete S.edDraft; save(); } $('drawer').hidden=true; document.body.style.overflow=''; }
   function fitCanvas(){
     var st=$('drawStage'), maxW=st.clientWidth-20, maxH=st.clientHeight-12, r=ED.img.naturalWidth/ED.img.naturalHeight, w=maxW, h=w/r;
     if(h>maxH){ h=maxH; w=h*r; }
@@ -932,9 +946,9 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
   var cv=$('drawCanvas');
   cv.addEventListener('pointerdown',function(e){ e.preventDefault(); cv.setPointerCapture(e.pointerId); ED.cur={c:ED.pen,pts:[ptOf(e)]}; ED.strokes.push(ED.cur); redraw(); });
   cv.addEventListener('pointermove',function(e){ if(!ED.cur) return; e.preventDefault(); var p=ptOf(e), l=ED.cur.pts[ED.cur.pts.length-1]; if(Math.abs(p[0]-l[0])+Math.abs(p[1]-l[1])>0.003){ ED.cur.pts.push(p); redraw(); } });
-  ['pointerup','pointercancel','pointerleave'].forEach(function(t){ cv.addEventListener(t,function(){ ED.cur=null; }); });
+  ['pointerup','pointercancel','pointerleave'].forEach(function(t){ cv.addEventListener(t,function(){ if(ED.cur){ S.edDraft={code:ED.code,strokes:ED.strokes}; save(); } ED.cur=null; }); });
   document.querySelectorAll('.pen').forEach(function(b){ b.addEventListener('click',function(){ ED.pen=b.dataset.pen; document.querySelectorAll('.pen').forEach(function(x){ x.setAttribute('aria-pressed', x===b?'true':'false'); }); }); });
-  $('drawUndo').addEventListener('click',function(){ ED.strokes.pop(); redraw(); });
+  $('drawUndo').addEventListener('click',function(){ ED.strokes.pop(); redraw(); S.edDraft={code:ED.code,strokes:ED.strokes}; save(); });
   $('drawClear').addEventListener('click',function(){ ED.strokes=[]; redraw(); });
   $('drawCancel').addEventListener('click',closeEditor);
   $('drawDone').addEventListener('click',function(){ PHOTOS[ED.code].strokes=ED.strokes; savePhotos(); closeEditor(); rerender(); var t=document.querySelector('[data-draw="'+ED.code+'"]'); if(t) t.scrollIntoView({block:'center'}); });
@@ -997,8 +1011,24 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
   $('sendResultBtn').addEventListener('click',function(){ if(needTeam()) return; sendResult('공청회 메모 포함'); });
 
   rerender(); refreshTabs();
-  idbOpen().then(function(db){ IDB=db; return loadPhotos(); }).then(function(){ rerender(); });
-  var start=(location.hash||'').slice(1); show(TABS.some(function(t){return t[0]===start})?start:'intro');
+  idbOpen().then(function(db){ IDB=db; return loadPhotos(); }).then(function(){
+    /* 선 긋다가 화면이 꺼졌으면 그은 선을 되살린다 */
+    var dr=S.edDraft; if(dr&&PHOTOS[dr.code]){ PHOTOS[dr.code].strokes=dr.strokes; savePhotos(); } delete S.edDraft; save();
+    rerender(); });
+  function okTab(n){ return TABS.some(function(t){return t[0]===n}); }
+  var start=(location.hash||'').slice(1); if(!okTab(start)) start=okTab(S.tab)?S.tab:'intro';
+  var keepY=(S.scroll&&S.scroll.tab===start)?S.scroll.y:0;
+  show(start);
+  if(keepY) setTimeout(function(){ window.scrollTo(0,keepY); },350);
+  /* 화면이 꺼지거나 다른 앱·페이지로 갈 때 마지막 상태를 한 번 더 저장 */
+  function flush(){
+    S.scroll={tab:S.tab,y:window.scrollY||0}; save();
+  }
+  document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='hidden') flush(); });
+  window.addEventListener('pagehide',flush);
+  window.addEventListener('beforeunload',flush);
+  if(!save()) $('storeWarn').hidden=false;
+  try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(); }catch(e){}
 })();
 </script>
 
