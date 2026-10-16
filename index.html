@@ -958,7 +958,13 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
   /* ---- 선생님께 보내기 ---- */
   function hhmm(){ var t=new Date(); return ('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2); }
   function siteBy(code){ return SITES.filter(function(s){return s.code.charAt(0)===code})[0]; }
-  function needTeam(){ if((S.team||'').trim()) return false; show('intro'); setTimeout(function(){ var t=$('team'); t.focus(); t.scrollIntoView({block:'center'}); },50); return true; }
+  function needTeam(el){
+    if((S.team||'').trim()) return false;
+    var v=null; try{ v=window.prompt('먼저 우리 조 이름을 적어 주세요 (예: 2학년 3반 4조)',''); }catch(e){}
+    if(v&&v.trim()){ S.team=v.trim(); $('team').value=S.team; save(); return false; }
+    if(el){ el.textContent='조 이름이 있어야 보낼 수 있어요. 「0 안내」 탭 맨 위 칸에 조 이름을 적고 다시 눌러 주세요.'; el.className='msg bad'; }
+    return true;
+  }
   function composite(code){
     return new Promise(function(res,rej){
       var P=PHOTOS[code], im=new Image();
@@ -987,8 +993,7 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
   }
   function failText(e){ return e&&e.message==='nourl' ? '선생님 수집 창구가 아직 준비 중이에요. 사진 저장을 먼저 해 두세요.' : '보내지 못했어요. 데이터 연결을 확인하고 다시 눌러 주세요.'; }
   function sendPhoto(code,btn){
-    if(needTeam()) return;
-    var m=$('sendmsg-'+code); btn.disabled=true; m.textContent='보내는 중…'; m.className='msg';
+    var m=$('sendmsg-'+code); if(needTeam(m)) return; btn.disabled=true; m.textContent='보내는 중…'; m.className='msg';
     composite(code).then(function(url){
       return post({type:'photo',team:S.team,site:code,siteName:code+' '+siteBy(code).name,lines:(PHOTOS[code].strokes||[]).length,image:url});
     }).then(function(){
@@ -1008,7 +1013,7 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
     return post(payload).then(function(){ S.sentResult=hhmm(); save(); if(st){ st.textContent=kind+' 결과 전송 완료 · '+S.sentResult; st.className='msg ok'; } })
       .catch(function(e){ if(st){ st.textContent=failText(e); st.className='msg bad'; } });
   }
-  $('sendResultBtn').addEventListener('click',function(){ if(needTeam()) return; sendResult('공청회 메모 포함'); });
+  $('sendResultBtn').addEventListener('click',function(){ if(needTeam($('sendStatus'))) return; sendResult('공청회 메모 포함'); });
 
   rerender(); refreshTabs();
   idbOpen().then(function(db){ IDB=db; return loadPhotos(); }).then(function(){
