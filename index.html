@@ -8,7 +8,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&family=IBM+Plex+Sans+KR:wght@400;500;600&family=Nanum+Gothic+Coding:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&family=IBM+Plex+Sans+KR:wght@400;500;600&family=Nanum+Gothic+Coding:wght@400;700&family=Nanum+Pen+Script&display=swap">
 <style>
 /* Layout: field-notebook sheets on a dark desk. A sticky case bar (team, score, grade) and a tab strip on top; one sheet per chapter below. Single deliberate light-paper look. */
 :root{
@@ -235,6 +235,35 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
 #drawer{position:fixed;inset:0;z-index:50;background:#111a1d;display:flex;flex-direction:column;
   padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
 #drawer[hidden]{display:none!important}
+#notebook{position:fixed;inset:0;z-index:60;background:#111a1d;display:flex;flex-direction:column;align-items:center;padding:env(safe-area-inset-top,0px) 10px env(safe-area-inset-bottom,0px)}
+#notebook[hidden]{display:none!important}
+.nbhead{width:100%;max-width:460px;display:flex;justify-content:space-between;align-items:center;padding:10px 4px;color:#e6eeeb}
+.nbhead b{font-family:var(--display);font-size:16px}
+#nbPage{flex:1 1 auto;min-height:0;width:100%;max-width:460px;display:grid;place-items:center}
+#nbPage svg{max-width:100%;max-height:100%;width:auto;height:100%;filter:drop-shadow(0 6px 14px rgba(0,0,0,.45))}
+#nbTabs{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;padding:10px 0 4px}
+#nbTabs button{background:#22323a;color:#e6eeeb;border:2px solid transparent;border-radius:999px;padding:5px 12px;font-size:14px}
+#nbTabs button[aria-pressed="true"]{border-color:#f3ecd8;background:#3f5d55}
+.nbnav{display:flex;gap:10px;padding:4px 0 14px}
+.nbnav button{background:transparent;color:#e6eeeb;border:1.5px solid #6b8580;border-radius:4px;padding:6px 16px;font-size:14px}
+.nbnav button:disabled{opacity:.35}
+#celebrate{position:fixed;inset:0;z-index:70;background:rgba(17,26,29,.72);display:grid;place-items:center;padding:16px}
+#celebrate[hidden]{display:none!important}
+.cel{width:min(340px,100%);background:#f7f4ea;border-radius:14px;padding:22px 18px 18px;text-align:center;box-shadow:0 14px 40px rgba(0,0,0,.4);animation:celpop .45s cubic-bezier(.2,1.4,.4,1)}
+.cel svg{width:200px;height:200px;display:block;margin:0 auto}
+.cel h2{font-family:var(--display);color:#c8891a;font-size:30px;margin:6px 0 2px}
+.cel .ct{font-family:'Nanum Pen Script',cursive;font-size:28px;color:var(--ink);margin:6px 0 4px}
+.cel .cm{font-size:14.5px;color:var(--ink);margin:4px 0}
+.cel .cs{font-size:13.5px;color:var(--ink-soft);margin:6px 0 14px}
+.cel button{background:#1f6f73;color:#fff;border:0;border-radius:8px;padding:10px 26px;font-size:15px;font-weight:600}
+.cel .tw{animation:tw 1.6s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
+.cel .tw2{animation-delay:.5s}.cel .tw3{animation-delay:1s}
+.cel .bob{animation:bob 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center bottom}
+@keyframes celpop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+@keyframes tw{0%,100%{transform:scale(.6);opacity:.5}50%{transform:scale(1.15);opacity:1}}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}
+@media (prefers-reduced-motion:reduce){.cel,.cel .tw,.cel .bob{animation:none}}
+.nbbtn{display:inline-flex;align-items:center;gap:6px;margin:6px 0 2px;background:#f3ecd8;color:#2b3f73;border:1.5px solid #c9b98a;border-radius:4px;padding:5px 12px;font-size:14px;font-weight:600}
 .dhead{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px;color:#e6eeeb}
 .dhead b{font-family:var(--display);font-size:16px}
 .dhead span{font-size:12.5px;color:#9fb5ad;display:block}
@@ -342,7 +371,7 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
   <h2>오프닝</h2>
   <div class="chat">
     <div class="say mong"><div class="av">몽</div><div class="bub"><b>몽돌이 · 수사 조수 AI</b>탐정님, 한바다 해설사님한테서 긴급 편지가 왔어요!</div></div>
-    <div class="say han"><div class="av">한</div><div class="bub"><b>한바다의 편지</b>제 보고서는 사라졌지만 다행히 초안을 적은 노트가 남아 있어요. 그런데 이 노트는 여러 해 전에 그린 것이라, 지금 현장과 다르게 그려진 곳이 있을 겁니다. 다른 곳을 찾으면, 그게 바로 선이 움직인 곳이에요.</div></div>
+    <div class="say han"><div class="av">한</div><div class="bub"><b>한바다의 편지</b>제 보고서는 사라졌지만 다행히 초안을 적은 노트가 남아 있어요. 그런데 이 노트는 여러 해 전에 그린 것이라, 지금 현장과 다르게 그려진 곳이 있을 겁니다. 다른 곳을 찾으면, 그게 바로 선이 움직인 곳이에요.<br><button type="button" class="nbbtn" data-notebook="0">📒 한바다의 노트 펼치기</button></div></div>
     <div class="say mong"><div class="av">몽</div><div class="bub"><b>몽돌이</b>선이 움직여요? 선은 그어놓으면 그대로인 거 아니에요?</div></div>
     <div class="say"><div class="av">탐</div><div class="bub"><b>탐정</b>사람이 그은 선은 그렇지. 바다가 긋는 선은 매일 바뀌어. 가자, 모두 현장에 남아 있을 거야.</div></div>
   </div>
@@ -463,6 +492,45 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
 </section>
 
 <input type="file" id="photoInput" accept="image/*" capture="environment" hidden>
+<div id="celebrate" hidden role="dialog" aria-modal="true" aria-labelledby="celTitle">
+  <div class="cel">
+    <svg viewBox="0 0 200 200" aria-hidden="true">
+      <path class="tw" d="M30 46 l4 10 l10 4 l-10 4 l-4 10 l-4 -10 l-10 -4 l10 -4z" fill="#f2b632"/>
+      <path class="tw tw2" d="M170 30 l5 12 l12 5 l-12 5 l-5 12 l-5 -12 l-12 -5 l12 -5z" fill="#f2b632"/>
+      <path class="tw tw3" d="M184 160 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3z" fill="#f2b632"/>
+      <g transform="rotate(8 140 110)"><rect x="112" y="64" width="62" height="80" rx="3" fill="#fffdf6" stroke="#6b5a3e" stroke-width="3"/>
+        <path d="M122 82 h40 M122 94 h40 M122 106 h30 M122 118 h36" stroke="#9fb5ad" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="156" cy="128" r="12" fill="none" stroke="#c0392b" stroke-width="3"/><text x="156" y="132" font-size="10" font-weight="700" fill="#c0392b" text-anchor="middle">복원</text></g>
+      <g class="bob">
+        <ellipse cx="88" cy="182" rx="50" ry="7" fill="#000" opacity=".1"/>
+        <path d="M30 136 C 26 98, 60 78, 92 80 C 128 82, 150 104, 146 138 C 142 170, 112 180, 86 179 C 56 178, 33 166, 30 136 Z" fill="#c4c9cc" stroke="#5d6469" stroke-width="4"/>
+        <circle cx="58" cy="110" r="2.5" fill="#9aa1a5"/><circle cx="120" cy="160" r="3" fill="#9aa1a5"/><circle cx="128" cy="104" r="2" fill="#9aa1a5"/><circle cx="48" cy="150" r="2" fill="#9aa1a5"/>
+        <path d="M50 92 C 54 70, 120 66, 128 90 Z" fill="#8a6a43" stroke="#5a4229" stroke-width="3.5" stroke-linejoin="round"/>
+        <path d="M40 94 C 70 84, 116 82, 140 94" fill="none" stroke="#5a4229" stroke-width="5" stroke-linecap="round"/>
+        <path d="M58 86 C 80 80, 100 80, 122 86" fill="none" stroke="#d9b06a" stroke-width="4"/>
+        <circle cx="72" cy="126" r="7" fill="#22292c"/><circle cx="106" cy="126" r="7" fill="#22292c"/>
+        <circle cx="74.5" cy="123.5" r="2.4" fill="#fff"/><circle cx="108.5" cy="123.5" r="2.4" fill="#fff"/>
+        <ellipse cx="60" cy="142" rx="8" ry="5" fill="#f2a7a7" opacity=".8"/><ellipse cx="118" cy="142" rx="8" ry="5" fill="#f2a7a7" opacity=".8"/>
+        <path d="M80 142 q9 10 18 0" fill="none" stroke="#22292c" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M144 132 q10 -6 14 -16" fill="none" stroke="#5d6469" stroke-width="4" stroke-linecap="round"/>
+        <path d="M32 140 q-12 4 -16 -6" fill="none" stroke="#5d6469" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="12" cy="128" r="9" fill="#dff1f7" stroke="#3f5d55" stroke-width="3.5"/>
+      </g>
+    </svg>
+    <h2 id="celTitle">사건 해결!</h2>
+    <div class="ct" id="celTeam"></div>
+    <p class="cm" id="celMeta"></p>
+    <p class="cm"><b>사라진 보고서를 완벽하게 복원했다.</b><br>몽돌이: "공청회장이 조용해졌어요!"</p>
+    <p class="cs">이 화면을 선생님께 보여주세요.</p>
+    <button type="button" id="celClose">닫기</button>
+  </div>
+</div>
+<div id="notebook" hidden role="dialog" aria-modal="true" aria-label="한바다의 노트">
+  <div class="nbhead"><b>📒 한바다의 노트</b><button type="button" class="ghost small" id="nbClose" style="color:#e6eeeb;border-color:#6b8580;background:transparent">닫기</button></div>
+  <div id="nbPage"></div>
+  <div id="nbTabs"></div>
+  <div class="nbnav"><button type="button" id="nbPrev">◀ 앞장</button><button type="button" id="nbNext">뒷장 ▶</button></div>
+</div>
 <div id="drawer" hidden role="dialog" aria-modal="true" aria-labelledby="drawTitle">
   <div class="dhead"><div><b id="drawTitle">선 긋기</b><span id="drawSub">손가락으로 사진 위에 선을 그어요</span></div><button type="button" class="ghost small" id="drawCancel" style="color:#e6eeeb;border-color:#6b8580">닫기</button></div>
   <div id="drawStage"><canvas id="drawCanvas"></canvas></div>
@@ -528,15 +596,15 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
           clue:['동료 해녀 증언','"순자 언니는 10시부터 11시 넘어서까지 나랑 자갈마당에서 그물 널었어. 한 번도 자리 안 떴어."']},
     ma3:{who:'ma', n:3, puzzle:'🏷 스티커 문제지', q:'지형 스티커 5개(해식애, 파식대, 시스택, 자갈 해빈, 범)를 「곶에서 만까지」 단면도의 칸 ①~⑤에 알맞게 붙여라. 스티커 뒷면의 숫자를 ①부터 순서대로 읽으면?', type:'숫자 5자리', ans:['47193'], hint:'곶 쪽부터: 절벽 → 그 앞의 평평한 바위 → 홀로 선 바위 기둥 → … 만 쪽: 자갈이 쌓인 해변과 둔덕.',
           clue:['자갈 틈에서 나온 보고서 조각 p.12',"\"결론: 2단계 데크 착공 전 최소 2년 관측을 권고한다.\" 조각 사이에 명함 '감지 오션데크 대표 마도윤'"]},
-    oh3:{who:'oh', n:3, puzzle:'📒 한바다의 노트', q:'노트 속 「정비 전 감지해변」 그림과 지금을 비교하라. 그림에는 없고 지금 있는, 사람이 만든 선은 몇 개인가?', type:'숫자 1자리', ans:['2','2개'], hint:'바다 속 하나, 해변 뒤 하나.',
+    oh3:{who:'oh', n:3, puzzle:'📒 한바다의 노트', notePage:3, q:'노트 속 「정비 전 감지해변」 그림과 지금을 비교하라. 그림에는 없고 지금 있는, 사람이 만든 선은 몇 개인가?', type:'숫자 1자리', ans:['2','2개'], hint:'바다 속 하나, 해변 뒤 하나.',
           clue:['오순자의 사진첩','태풍 다음 날 부서진 해변 사진 + 메모 "두 달 지나니 자갈이 다시 쌓였다. 그래도 난 무섭다."']},
     seok3:{who:'seok', n:3, q:'물가의 자갈과 둔덕 위의 자갈을 각각 3개씩 들어보고 제자리에 두라. 더 크고 납작한 자갈은 ( 물가 / 둔덕 )에 있다.', type:'한글 2자', ans:['둔덕'], hint:'큰 파도만 무거운 자갈을 높이 밀어 올릴 수 있어요.',
           clue:['석무진 연구 계획서','"정비 전후 자갈 크기 비교. 한바다 선생님 보고서가 발표되면 인용 가능"']}
   };
   var NOTES = {
-    n1:{t:'노트 비교 ①', q:'한바다의 노트 속 순환로 그림과 지금의 순환로를 비교하라. 다른 점은?'},
-    n2:{t:'노트 비교 ②', q:'노트 속 신선바위 그림과 지금을 비교하라. 그림에는 있는데 지금 없는 것, 지금 있는데 그림에 없는 것은?'},
-    n3:{t:'노트 비교 ③', q:'감지해변의 세 개의 선을 기록하라.', rows:['이안제: 어디에 있고, 누가 그었나','자갈 둔덕(범): 몇 줄이 보이나','계단식 호안: 어디에 있고, 노트에도 있나']}
+    n1:{page:1, t:'노트 비교 ①', q:'한바다의 노트 속 순환로 그림과 지금의 순환로를 비교하라. 다른 점은?'},
+    n2:{page:2, t:'노트 비교 ②', q:'노트 속 신선바위 그림과 지금을 비교하라. 그림에는 있는데 지금 없는 것, 지금 있는데 그림에 없는 것은?'},
+    n3:{page:3, t:'노트 비교 ③', q:'감지해변의 세 개의 선을 기록하라.', rows:['이안제: 어디에 있고, 누가 그었나','자갈 둔덕(범): 몇 줄이 보이나','계단식 호안: 어디에 있고, 노트에도 있나']}
   };
   var VERIFY = ['"고운 모래사장"','"발가락 사이로 모래가 스며든다"','"파도 소리가 \'쏴아—\' 하고 부드럽다"'];
   var MOTIVES = [
@@ -643,7 +711,7 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
   /* ---- missions ---- */
   function pinHtml(id){
     var p=PINS[id], su=SUSPECTS[p.who], solved=!!S.solved[id];
-    var media = p.img ? '<figure><img src="'+p.img+'" alt="'+esc(p.photo||'')+'" loading="lazy"><figcaption>'+esc(p.photo||'')+'</figcaption></figure>' : p.photo ?'<div class="photo">📷 '+esc(p.photo)+' · 사전답사 후 실제 사진이 들어갈 자리</div>' : (p.teach? p.teach.map(function(t){ return '<div class="photo teach"><b>📷 '+esc(t[0])+'</b><ul>'+t[1].map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>'; }).join('') : p.puzzle? '<div class="hint">'+esc(p.puzzle)+' 사용</div>':'');
+    var media = p.img ? '<figure><img src="'+p.img+'" alt="'+esc(p.photo||'')+'" loading="lazy"><figcaption>'+esc(p.photo||'')+'</figcaption></figure>' : p.photo ?'<div class="photo">📷 '+esc(p.photo)+' · 사전답사 후 실제 사진이 들어갈 자리</div>' : (p.teach? p.teach.map(function(t){ return '<div class="photo teach"><b>📷 '+esc(t[0])+'</b><ul>'+t[1].map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>'; }).join('') : p.notePage? '<button type="button" class="nbbtn" data-notebook="'+p.notePage+'">📒 노트 p.'+p.notePage+' 펼치기</button>' : p.puzzle? '<div class="hint">'+esc(p.puzzle)+' 사용</div>':'');
     var body = solved
       ? '<div class="msg ok">정답! 단서를 확보했다.'+(S.reveal[id]?' (정답 보기 사용)':'')+'</div><div class="clue"><span class="ct">'+esc(p.clue[0])+'</span>'+(p.clueImg?'<div class="recshot"><img src="'+p.clueImg.src+'" alt="고하늘 타임랩스 화면" loading="lazy"><span class="rec"><i>●</i> '+esc(p.clueImg.rec.replace('●','').trim())+'</span><span class="rtime">'+esc(p.clueImg.time)+'</span></div>':'')+esc(p.clue[1])+'</div>'
       : '<div class="ansrow"><input id="in-'+id+'" type="text" inputmode="'+(p.type.indexOf('숫자')>-1?'numeric':'text')+'" placeholder="정답 입력" autocomplete="off"><button type="button" class="primary small" data-check="'+id+'">확인</button>'+
@@ -661,7 +729,7 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
     var inner = n.rows
       ? n.rows.map(function(r,i){return '<label style="display:block;font-size:13px;margin-top:6px" for="'+id+'-'+i+'">'+esc(r)+'</label><input id="'+id+'-'+i+'" data-note="'+id+'" data-row="'+i+'" type="text" value="'+esc((v&&v[i])||'')+'">'}).join('')
       : '<textarea id="'+id+'" data-note="'+id+'" placeholder="달라진 점을 적어요">'+esc(v||'')+'</textarea>';
-    return '<div class="note"><div class="nt">📒 '+esc(n.t)+' <span class="msg '+(done?'ok':'')+'" id="nm-'+id+'">'+(done?'기록 완료 +2':'')+'</span></div><p class="q" style="margin:4px 0">'+esc(n.q)+'</p>'+inner+'</div>';
+    return '<div class="note"><div class="nt">📒 '+esc(n.t)+' <span class="msg '+(done?'ok':'')+'" id="nm-'+id+'">'+(done?'기록 완료 +2':'')+'</span></div><p class="q" style="margin:4px 0">'+esc(n.q)+'</p>'+(n.page?'<button type="button" class="nbbtn" data-notebook="'+n.page+'">📒 노트 p.'+n.page+' 펼치기</button>':'')+inner+'</div>';
   }
   function verifyHtml(){
     return '<div class="note"><div class="nt">🔎 최종 검증 · 진술 대조</div><p class="q" style="margin:4px 0">감지해변에서 눈을 감고 30초 동안 파도 소리를 들어라. 그리고 마도윤의 진술과 비교하라.</p>'+
@@ -808,14 +876,14 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
       story=[['몽돌이','"거의 다 왔어요! 그런데 공청회에서 마도윤 씨가 손을 들었어요."'],['마도윤','"「'+wrong.map(function(a){return a.p.title}).join('」, 「')+'」 부분은 틀렸잖소. 이런 보고서를 믿으라고?"'],['한바다','"틀린 부분만 다시 확인하면 돼요. 표시된 영역을 고쳐서 다시 제출해 주세요."']];}
     else{st.textContent='복원 실패';st.classList.remove('done');ss.textContent='훼손 심함';kind='bad';badge='📂 미완성 엔딩';title='공청회가 연기되었다';
       story=[['몽돌이','"보고서에 빈 구멍이 너무 많아요. 이대로는 발표할 수 없대요."'],['한바다','"괜찮아요. 수사 수첩과 단서 카드를 다시 펼쳐 보세요. 답은 전부 현장에 있었어요."']];}
-    S.rDone=perfect; S.lastReport=right+'/'+total; save(); refreshTabs(); sendResult('보고서 복원');
+    S.rDone=perfect; S.lastReport=right+'/'+total; if(perfect&&!S.doneAt) S.doneAt=Date.now(); save(); refreshTabs(); sendResult('보고서 복원'); if(perfect) setTimeout(celebrate,900);
     var obs=$('b14').value;
     $('rresult').innerHTML='<div class="ending"><div class="eyebrow">복원 결과</div><h3>'+esc(title)+'</h3><span class="badge '+kind+'">'+esc(badge)+'</span>'+
       '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:12px"><span class="big">'+right+'</span><span class="hint">/ '+total+' 칸 정답</span></div>'+
       '<ul class="areas">'+res.map(function(a){var ok=a.r===a.t;return '<li class="'+(ok?'ok':'bad')+'"><span>'+a.p.num+' '+esc(a.p.title)+'</span><span>'+(ok?'완료':a.r+' / '+a.t)+'</span></li>'}).join('')+'</ul>'+
       '<div class="story">'+story.map(function(s){return '<p><span class="who">'+esc(s[0])+'</span> '+esc(s[1])+'</p>'}).join('')+'</div>'+
       (perfect?'<div class="actions"><button class="primary" data-go="hearing">2부 공청회 →</button></div>':'<div class="actions"><button type="button" class="ghost" id="rRetry">틀린 부분 고치러 가기</button></div>')+
-      '<div class="receipt">선생님께 보여주세요 · <b>'+esc(S.team||'이름 없는 수사팀')+'</b> · 보고서 '+right+'/'+total+' · 제출 '+S.rAttempts+'회 · 관찰한 둔덕 '+esc(obs)+(obs==='보이지 않음'?'':'줄')+' · 수사 총점 '+score()+'점</div></div>';
+      '<div class="receipt">선생님께 보여주세요 · <b>'+esc(S.team||'이름 없는 수사팀')+'</b> · 보고서 '+right+'/'+total+' · 제출 '+S.rAttempts+'회 · 관찰한 둔덕 '+esc(obs)+(obs==='보이지 않음'?'':'줄')+' · 수사 총점 '+score()+'점</div>'+(perfect?'<p style="text-align:center;margin:10px 0 0"><button type="button" class="nbbtn" data-celebrate="1">🎉 완성 화면 다시 보기</button></p>':'')+'</div>';
     var rr=$('rRetry'); if(rr) rr.addEventListener('click',function(){var f=document.querySelector('.blank.bad select'); if(f){f.scrollIntoView({block:'center'}); f.focus({preventScroll:true});}});
     $('rhint').textContent='지금까지 '+S.rAttempts+'번 제출했어요.';
     $('rresult').scrollIntoView({block:'start'});
@@ -954,6 +1022,121 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
   $('drawDone').addEventListener('click',function(){ PHOTOS[ED.code].strokes=ED.strokes; savePhotos(); closeEditor(); rerender(); var t=document.querySelector('[data-draw="'+ED.code+'"]'); if(t) t.scrollIntoView({block:'center'}); });
   window.addEventListener('resize',function(){ if(!$('drawer').hidden){ fitCanvas(); redraw(); } });
   document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!$('drawer').hidden) closeEditor(); });
+
+  /* ---- 한바다의 노트 ---- */
+  var NB_W=360, NB_H=520;
+  function nbPaper(){
+    var s='<rect width="360" height="520" rx="6" fill="#fbf7ea"/>';
+    for(var y=86;y<510;y+=24) s+='<line x1="0" y1="'+y+'" x2="360" y2="'+y+'" stroke="#c9d9e8" stroke-width="1"/>';
+    s+='<line x1="44" y1="0" x2="44" y2="520" stroke="#e7a3a3" stroke-width="1.2"/>';
+    for(var h=30;h<520;h+=44) s+='<circle cx="18" cy="'+h+'" r="6" fill="#d8d2c0"/><path d="M6 '+(h-2)+' q12 -10 18 2" fill="none" stroke="#8b8b8b" stroke-width="2.4"/>';
+    return s;
+  }
+  function T(x,y,txt,o){ o=o||{}; return '<text x="'+x+'" y="'+y+'" font-family="\'Nanum Pen Script\',cursive" font-size="'+(o.s||21)+'" fill="'+(o.c||'#2b3f73')+'"'+(o.a?' text-anchor="'+o.a+'"':'')+(o.r?' transform="rotate('+o.r+' '+x+' '+y+')"':'')+'>'+txt+'</text>'; }
+  var PEN='#2b3f73', PENCIL='#5b5b5b', RED='#c0392b';
+  function nbHead(no,title,date){
+    return T(56,40,title,{s:28,c:PEN})+T(340,40,date,{s:18,c:PENCIL,a:'end'})+'<path d="M56 50 q120 6 250 -2" fill="none" stroke="'+PEN+'" stroke-width="1.6"/>'+T(340,508,'p.'+no,{s:16,c:PENCIL,a:'end'});
+  }
+  var NB_PAGES=[
+    {tab:'표지', svg:function(){
+      return '<rect width="360" height="520" rx="6" fill="#3f5d55"/><rect x="8" y="8" width="344" height="504" rx="4" fill="none" stroke="#2c443e" stroke-width="2"/>'+
+        '<rect x="70" y="120" width="230" height="150" rx="4" fill="#f3ecd8" transform="rotate(-1.5 185 195)"/>'+
+        T(185,170,'관찰 노트',{s:40,c:PEN,a:'middle'})+T(185,206,'태종대 · 감지해변',{s:24,c:PEN,a:'middle'})+T(185,244,'한바다',{s:24,c:PENCIL,a:'middle'})+
+        '<rect x="120" y="108" width="70" height="20" fill="#e8dca0" opacity=".75" transform="rotate(-8 155 118)"/>'+
+        '<circle cx="262" cy="390" r="38" fill="none" stroke="#6e5232" stroke-width="7" opacity=".25"/>'+
+        T(185,330,'2017 ~ 2019',{s:22,c:'#e9e2cc',a:'middle'})+T(185,470,'바다가 그은 선은 매일 바뀐다',{s:20,c:'#e9e2cc',a:'middle'});
+    }},
+    {tab:'① 순환로', svg:function(){
+      var loop='M110 400 C 70 330, 80 220, 140 170 C 190 130, 270 120, 300 175 C 330 230, 320 330, 270 380 C 230 420, 160 440, 110 400 Z';
+      var st=[[110,400,'입구 광장','e',8,24],[86,280,'자갈마당','e',-62,6],[150,160,'전망대','s',-22,-14],[300,190,'영도등대','w',-18,-14],[312,300,'신선바위 ↓','w',-70,30],[245,395,'태종사','n',-10,30]];
+      var s=nbPaper()+nbHead(1,'태종대 한 바퀴','2018. 4.');
+      s+='<path d="'+loop+'" fill="none" stroke="'+PEN+'" stroke-width="2.6" stroke-dasharray="1 0"/>';
+      s+='<path d="M330 120 q 20 120 0 300" fill="none" stroke="#7aa6c9" stroke-width="2"/><path d="M60 150 q -14 120 4 280" fill="none" stroke="#7aa6c9" stroke-width="2"/>'+T(345,250,'바 다',{s:18,c:'#5c8db5',a:'middle',r:90})+T(40,300,'바 다',{s:18,c:'#5c8db5',a:'middle',r:-90});
+      st.forEach(function(p){ s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="6" fill="#fbf7ea" stroke="'+PEN+'" stroke-width="2.4"/>'+T(p[0]+p[4],p[1]+p[5],p[2],{s:20}); });
+      s+='<path d="M120 362 l-8 -14 l14 4" fill="none" stroke="'+RED+'" stroke-width="2"/>'+T(140,340,'이쪽으로 돈다',{s:17,c:RED,r:-30});
+      s+=T(200,280,'숲',{s:22,c:'#4f7a52',a:'middle'})+T(200,300,'(난대림)',{s:16,c:'#4f7a52',a:'middle'});
+      s+=T(56,470,'※ 길 바깥은 전부 절벽. 바다 쪽 난간 확인할 것',{s:17,c:PENCIL});
+      s+=T(56,494,'※ 그 뒤에 새로 생긴 건 이 그림에 없다',{s:17,c:PENCIL});
+      return s;
+    }},
+    {tab:'② 신선바위', svg:function(){
+      var s=nbPaper()+nbHead(2,'신선바위 · 망부석','2017. 9.');
+      // cliff + lighthouse
+      s+='<path d="M250 70 L250 230 L300 300 L360 300 L360 70" fill="#e9e3d0" stroke="'+PENCIL+'" stroke-width="1.6"/>';
+      s+='<rect x="292" y="96" width="18" height="70" fill="#fff" stroke="'+PEN+'" stroke-width="2"/><path d="M288 96 h26 l-6 -14 h-14 z" fill="#fff" stroke="'+PEN+'" stroke-width="2"/>'+T(276,192,'영도등대',{s:17,c:PENCIL});
+      // flat rock terrace layers
+      s+='<path d="M56 300 L250 300 L300 300 L330 318 L56 322 Z" fill="#d9cfb8" stroke="'+PEN+'" stroke-width="2"/>';
+      s+='<path d="M60 308 h240 M64 314 h250" stroke="'+PENCIL+'" stroke-width="1" stroke-dasharray="6 4"/>';
+      // mangbuseok
+      s+='<path d="M150 300 q-6 -40 2 -66 q8 -10 14 2 q6 30 2 64 z" fill="#c9bfa5" stroke="'+PEN+'" stroke-width="2"/>'+T(120,222,'망부석',{s:19,c:RED});
+      // people walking
+      [[95,300],[205,300],[228,300]].forEach(function(p){ var x=p[0],y=p[1]; s+='<g stroke="'+PEN+'" stroke-width="1.8" fill="none"><circle cx="'+x+'" cy="'+(y-26)+'" r="4"/><path d="M'+x+' '+(y-22)+' v12 M'+x+' '+(y-10)+' l-5 10 M'+x+' '+(y-10)+' l5 10 M'+(x-6)+' '+(y-17)+' h12"/></g>'; });
+      // sea waves
+      s+='<path d="M56 342 q12 -8 24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0" fill="none" stroke="#5c8db5" stroke-width="2"/>';
+      s+='<path d="M56 362 q12 -8 24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0" fill="none" stroke="#7aa6c9" stroke-width="1.6"/>';
+      s+=T(56,404,'평평한 바닥 = 옛날 파도가 깎은 바닥.',{s:19});
+      s+=T(56,428,'지금은 바다보다 높이 올라와 있다 (땅이 솟음)',{s:19});
+      s+=T(56,460,'사람들이 바위 위를 걸어 다닌다. 끝까지 감.',{s:19,c:PENCIL});
+      s+='<path d="M200 448 q-20 -60 0 -120" fill="none" stroke="'+RED+'" stroke-width="1.6" stroke-dasharray="4 3"/>';
+      s+=T(56,492,'※ 층층이 줄무늬 = 호수에서 쌓인 지층',{s:17,c:PENCIL});
+      return s;
+    }},
+    {tab:'③ 감지해변', svg:function(){
+      var s=nbPaper()+nbHead(3,'감지해변 (정비 전)','2019. 8. 태풍 뒤');
+      // sea
+      s+='<rect x="46" y="62" width="314" height="96" fill="#dbe9f3"/>';
+      for(var y=78;y<156;y+=18) s+='<path d="M56 '+y+' q12 -6 24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0" fill="none" stroke="#7aa6c9" stroke-width="1.5"/>';
+      s+=T(200,92,'바 다',{s:20,c:'#3f6f99',a:'middle'});
+      // shoreline
+      s+='<path d="M46 160 C 120 172, 240 150, 360 166" fill="none" stroke="'+PEN+'" stroke-width="2.6"/>';
+      // pebbles
+      var seed=7; function rnd(){ seed=(seed*9301+49297)%233280; return seed/233280; }
+      for(var i=0;i<120;i++){ var x=52+rnd()*300, yy=168+rnd()*130; s+='<ellipse cx="'+x.toFixed(1)+'" cy="'+yy.toFixed(1)+'" rx="'+(2+rnd()*3).toFixed(1)+'" ry="'+(1.5+rnd()*2).toFixed(1)+'" fill="none" stroke="#8a8170" stroke-width="1"/>'; }
+      // berms
+      s+='<path d="M46 202 C 120 214, 240 192, 360 208" fill="none" stroke="#2d7dd2" stroke-width="3.2" stroke-dasharray="10 5"/>';
+      s+='<path d="M46 262 C 130 272, 250 252, 360 266" fill="none" stroke="#2d7dd2" stroke-width="3.2" stroke-dasharray="10 5"/>';
+      s+=T(250,198,'둔덕 ①',{s:19,c:'#1f5fa6'})+T(250,258,'둔덕 ②',{s:19,c:'#1f5fa6'});
+      // back: road + tents
+      s+='<path d="M46 304 C 140 312, 250 300, 360 308" fill="none" stroke="'+PENCIL+'" stroke-width="2"/><path d="M46 330 C 140 338, 250 326, 360 334" fill="none" stroke="'+PENCIL+'" stroke-width="2"/>'+T(300,325,'길',{s:17,c:PENCIL});
+      [70,108,146].forEach(function(x){ s+='<path d="M'+x+' 304 l16 -20 l16 20" fill="#f1e3c4" stroke="'+PENCIL+'" stroke-width="1.6"/>'; });
+      s+=T(64,352,'조개구이 천막',{s:16,c:PENCIL});
+      // haenyeo path
+      s+='<path d="M210 300 C 214 260, 200 210, 214 156" fill="none" stroke="#2c9a4b" stroke-width="2.4" stroke-dasharray="3 5"/>'+T(220,290,'해녀 할머니 길',{s:16,c:'#2c7a3b'});
+      // notes
+      s+=T(56,392,'① 아래 줄: 평소 파도가 자갈을 밀어 올린 자리',{s:18});
+      s+=T(56,416,'② 위 줄: 태풍 때 큰 파도가 올라온 자리',{s:18});
+      s+=T(56,446,'바다 쪽엔 아무것도 없다. 파도가 그대로 들어온다.',{s:18,c:PENCIL});
+      s+=T(56,470,'해변 뒤는 자갈 → 바로 길.',{s:18,c:PENCIL});
+      s+=T(56,498,'선 두 줄 모두 바다가 그었다!',{s:20,c:RED});
+      return s;
+    }}
+  ];
+  var NB_CUR=0;
+  function openNotebook(i){
+    NB_CUR=Math.max(0,Math.min(NB_PAGES.length-1,i||0));
+    var box=$('nbTabs'); box.innerHTML=NB_PAGES.map(function(p,k){ return '<button type="button" data-nbp="'+k+'" aria-pressed="'+(k===NB_CUR)+'">'+p.tab+'</button>'; }).join('');
+    $('nbPage').innerHTML='<svg viewBox="0 0 '+NB_W+' '+NB_H+'" role="img" aria-label="한바다의 노트 '+NB_PAGES[NB_CUR].tab+'">'+NB_PAGES[NB_CUR].svg()+'</svg>';
+    $('nbPrev').disabled=NB_CUR===0; $('nbNext').disabled=NB_CUR===NB_PAGES.length-1;
+    $('notebook').hidden=false; document.body.style.overflow='hidden';
+  }
+  function closeNotebook(){ $('notebook').hidden=true; document.body.style.overflow=''; }
+  $('nbTabs').addEventListener('click',function(e){ var b=e.target.closest('[data-nbp]'); if(b) openNotebook(+b.dataset.nbp); });
+  $('nbPrev').addEventListener('click',function(){ openNotebook(NB_CUR-1); });
+  $('nbNext').addEventListener('click',function(){ openNotebook(NB_CUR+1); });
+  $('nbClose').addEventListener('click',closeNotebook);
+  $('notebook').addEventListener('click',function(e){ if(e.target.id==='notebook') closeNotebook(); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!$('notebook').hidden) closeNotebook(); });
+  document.addEventListener('click',function(e){ var b=e.target.closest('[data-notebook]'); if(b) openNotebook(+b.dataset.notebook); });
+
+  /* ---- 완성 축하 ---- */
+  function celebrate(){
+    var t=new Date(S.doneAt||Date.now());
+    $('celTeam').textContent=S.team||'이름 없는 수사팀';
+    $('celMeta').innerHTML=esc((t.getMonth()+1)+'월 '+t.getDate()+'일 '+('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2)+' · 보고서 '+(S.lastReport||'')+' 복원')+'<br>총점 <b>'+score()+'점</b> · '+esc(grade(score()));
+    $('celebrate').hidden=false; $('celClose').focus();
+  }
+  $('celClose').addEventListener('click',function(){ $('celebrate').hidden=true; });
+  document.addEventListener('click',function(e){ if(e.target.closest('[data-celebrate]')) celebrate(); });
 
   /* ---- 선생님께 보내기 ---- */
   function hhmm(){ var t=new Date(); return ('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2); }
