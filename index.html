@@ -246,6 +246,16 @@ figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
 .pol .ph img{width:100%;height:100%;object-fit:cover;display:block}
 .pol .tx{font-family:'Nanum Pen Script',cursive;font-size:21px;line-height:1.15;color:#2b3f73;margin:8px 2px 4px;word-break:keep-all;overflow-wrap:anywhere}
 .pol .mt{font-size:11.5px;color:var(--ink-soft);display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap}
+#glight{position:fixed;inset:0;z-index:80;background:rgba(10,16,18,.92);display:flex;align-items:center;justify-content:center;padding:16px}
+#glight[hidden]{display:none!important}
+.glbox{width:min(720px,100%);max-height:100%;display:flex;flex-direction:column;gap:10px}
+#glImg{width:100%;max-height:70vh;object-fit:contain;border-radius:4px;background:#000}
+.glcap{background:#fffef9;border-radius:4px;padding:12px 14px}
+.glcap .tx{font-family:'Nanum Pen Script',cursive;font-size:26px;line-height:1.2;color:#2b3f73}
+.glcap .mt{font-size:13px;color:var(--ink-soft);margin-top:4px}
+.glbtns{display:flex;justify-content:flex-end;gap:8px}
+.glbtns .ghost{color:#e6eeeb;border-color:#6b8580;background:transparent}
+.glbtns .primary{background:#f3f6f3;color:#1c2a2e;border-color:#f3f6f3}
 .gdel{margin-top:8px;width:100%;background:transparent;border:1px solid var(--rule);border-radius:3px;font-size:12.5px;color:var(--ink-soft);padding:4px 0}
 label.gloc{font-family:var(--body);font-size:14px;color:var(--ink);cursor:pointer}label.gloc input{width:18px;height:18px;margin:0}
 .pol .q{position:absolute;top:12px;right:12px;background:#d8752a;color:#fff;font-size:11.5px;font-weight:700;border-radius:999px;padding:1px 8px}
@@ -581,6 +591,13 @@ label.gloc{font-family:var(--body);font-size:14px;color:var(--ink);cursor:pointe
   <div class="actions" style="justify-content:space-between"><h2 style="margin:0">앨범</h2><button type="button" class="ghost small" id="gReload">새로고침</button></div>
   <div class="album" id="album"><p class="hint">불러오는 중…</p></div>
 </section>
+<div id="glight" hidden role="dialog" aria-modal="true" aria-label="방명록 사진 크게 보기">
+  <div class="glbox">
+    <img id="glImg" alt="">
+    <div class="glcap"><div class="tx" id="glText"></div><div class="mt" id="glMeta"></div></div>
+    <div class="glbtns"><button type="button" class="ghost small" id="glMap" hidden>📍 지도에서 보기</button><button type="button" class="primary small" id="glClose">닫기</button></div>
+  </div>
+</div>
 <input type="file" id="gPhotoInput" accept="image/*" hidden>
 <footer>등장인물과 2단계 데크 공사는 가상입니다. 감지해변의 이안제와 호안은 실제 시설입니다.</footer>
 </main>
@@ -1266,7 +1283,20 @@ label.gloc{font-family:var(--body);font-size:14px;color:var(--ink);cursor:pointe
       post({type:'guestDel',id:d.dataset.gdel,key:S.gkey}).then(function(){ S.gmine=S.gmine.filter(function(x){return x!==d.dataset.gdel}); save(); gLoad(); })
         .catch(function(err){ d.disabled=false; d.textContent='🗑 삭제'; var m=$('gMsg'); m.textContent=failText(err); m.className='msg bad'; });
       return; }
-    var c=e.target.closest('[data-gi]'); if(!c) return; var mk=G.markers[+c.dataset.gi]; if(mk&&G.map){ $('gmap').scrollIntoView({block:'center'}); G.map.setView(mk.getLatLng(),17); mk.openPopup(); } });
+    var c=e.target.closest('[data-gi]'); if(c){ gOpen(+c.dataset.gi); return; } if(!c) return; var mk=G.markers[+c.dataset.gi]; if(mk&&G.map){ $('gmap').scrollIntoView({block:'center'}); G.map.setView(mk.getLatLng(),17); mk.openPopup(); } });
+  var GL=-1;
+  function gOpen(i){
+    var it=G.items[i]; if(!it) return; GL=i;
+    var im=$('glImg'); if(it.img){ im.src='https://drive.google.com/thumbnail?id='+encodeURIComponent(it.img)+'&sz=w1600'; im.hidden=false; im.alt=it.team+'의 사진'; } else { im.removeAttribute('src'); im.hidden=true; }
+    $('glText').textContent=it.text; $('glMeta').textContent=(it.kind==='질문'?'질문 · ':'')+it.team+' · '+gWhen(it.at)+(it.lat!=null?' · '+Number(it.lat).toFixed(5)+', '+Number(it.lng).toFixed(5):'');
+    $('glMap').hidden=!(G.markers[i]&&G.map);
+    $('glight').hidden=false; document.body.style.overflow='hidden';
+  }
+  function gClose(){ $('glight').hidden=true; document.body.style.overflow=''; }
+  $('glClose').addEventListener('click',gClose);
+  $('glight').addEventListener('click',function(e){ if(e.target.id==='glight') gClose(); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!$('glight').hidden) gClose(); });
+  $('glMap').addEventListener('click',function(){ var mk=G.markers[GL]; gClose(); if(mk&&G.map){ $('gmap').scrollIntoView({block:'center'}); G.map.setView(mk.getLatLng(),17); mk.openPopup(); } });
   $('gReload').addEventListener('click',gLoad);
   function openGuest(){ gMapInit(); setTimeout(function(){ if(G.map) G.map.invalidateSize(); },60); gIdbGet(); gLocUI(); if(G.locOn&&G.lat==null) gLocate(true); gLoad(); }
 
