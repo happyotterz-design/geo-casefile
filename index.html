@@ -694,10 +694,13 @@ label.gloc{font-family:var(--body);font-size:14px;color:var(--ink);cursor:pointe
 
   var TABS = [['intro','0 안내'],['case','1 사건'],['people','2 인물'],['map','3 지도'],['missions','4 미션'],['final','5 최종 보고'],['report','6 보고서 복원'],['hearing','7 공청회'],['guest','8 방명록']];
   var KEY='geo-casefile-v1';
+  /* 발표 시연용: ?demo=report 로 열면 학생 기록과 분리된 상태에서 보고서 복원만 바로 연다 (저장·전송 없음) */
+  var DEMO=/[?&]demo=report\b/.test(location.search);
   var S = fresh();
   function fresh(){return {team:'',solved:{},hint:{},reveal:{},notes:{},verify:{},memo:{},final:{done:false},report:{},rAttempts:0,rDone:false,hearing:'',started:Date.now()}}
-  try{var raw=localStorage.getItem(KEY); if(raw){var d=JSON.parse(raw); for(var k in d) S[k]=d[k];}}catch(e){}
-  function save(){try{localStorage.setItem(KEY,JSON.stringify(S)); return true;}catch(e){ return false; }}
+  if(!DEMO){ try{var raw=localStorage.getItem(KEY); if(raw){var d=JSON.parse(raw); for(var k in d) S[k]=d[k];}}catch(e){} }
+  else { S.team='시연'; S.final={done:true,suspect:'ma',motive:'m_ma',evidence:[],at:Date.now()}; S.tab='report'; }
+  function save(){if(DEMO) return true; try{localStorage.setItem(KEY,JSON.stringify(S)); return true;}catch(e){ return false; }}
   S.draft=S.draft||{};
   function $(id){return document.getElementById(id)}
   function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
@@ -720,6 +723,7 @@ label.gloc{font-family:var(--body);font-size:14px;color:var(--ink);cursor:pointe
   TABS.forEach(function(t){
     var b=document.createElement('button'); b.type='button'; b.setAttribute('role','tab'); b.textContent=t[1]; b.dataset.tab=t[0]; b.id='tb-'+t[0];
     b.addEventListener('click',function(){show(t[0])}); tabsEl.appendChild(b);
+    if(DEMO && t[0]!=='report') b.hidden=true;
   });
   function show(name){
     TABS.forEach(function(t){ var on=t[0]===name; $('t-'+t[0]).hidden=!on; $('tb-'+t[0]).setAttribute('aria-selected',on?'true':'false'); });
@@ -1356,6 +1360,7 @@ label.gloc{font-family:var(--body);font-size:14px;color:var(--ink);cursor:pointe
   }
   function evName(id){ return id==='verify'?'감지해변 진술 대조':(PINS[id]?PINS[id].clue[0]:id); }
   function sendResult(kind){
+    if(DEMO) return;
     var F=S.final, st=$('sendStatus');
     var mot=F.motive?(MOTIVES.filter(function(x){return x.id===F.motive})[0]||{}).t:'';
     var payload={type:'result',team:S.team,kind:kind,score:score(),grade:grade(score()),
@@ -1376,6 +1381,7 @@ label.gloc{font-family:var(--body);font-size:14px;color:var(--ink);cursor:pointe
     rerender(); });
   function okTab(n){ return TABS.some(function(t){return t[0]===n}); }
   var start=(location.hash||'').slice(1); if(!okTab(start)) start=okTab(S.tab)?S.tab:'intro';
+  if(DEMO) start='report';
   var keepY=(S.scroll&&S.scroll.tab===start)?S.scroll.y:0;
   show(start);
   if(keepY) setTimeout(function(){ window.scrollTo(0,keepY); },350);
