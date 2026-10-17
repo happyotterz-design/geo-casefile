@@ -568,7 +568,6 @@ label.gloc{font-family:var(--body);font-size:14px;color:var(--ink);cursor:pointe
   <div class="dtools">
     <button type="button" class="pen" data-pen="n" aria-pressed="true"><i style="background:#2d7dd2"></i>자연이 그은 선</button>
     <button type="button" class="pen" data-pen="h" aria-pressed="false"><i style="background:#d83a2e"></i>사람이 그은 선</button>
-    <button type="button" class="pen" data-pen="x" aria-pressed="false"><i style="background:#2c9a4b"></i>넘나드는 선</button>
     <button type="button" class="ghost small" id="drawUndo">되돌리기</button>
     <button type="button" class="ghost small" id="drawClear">모두 지우기</button>
     <button type="button" class="primary small" id="drawDone">저장</button>
@@ -617,12 +616,12 @@ label.gloc{font-family:var(--body);font-size:14px;color:var(--ink);cursor:pointe
         say:'"영도등대 아래 관람로에서 절벽 사진을 찍고 있었습니다. 절벽 밑동이 파도에 움푹 파여 있더군요. 신선바위는 바닷물보다 높은 데 있고요. 한바다 선생님께 정비 전 측량 자료를 논문에 쓰게 해달라고 했다가 거절당했죠. 그래도 훔칠 정도는 아닙니다. 제 지질 망치요? 지난주에 잃어버렸는데요."'}
   };
   var SITES = [
-    {code:'A', name:'태종대 전망대', line:'수평선 너머 대한해협, 나라와 나라의 경계', pins:['go1','ma1'], note:'n1', shot:'바다 쪽을 찍고, 수평선과 양옆으로 물러난 해안선을 파랑으로 그어보자. 대마도가 보이면 그 위에 초록 점선으로 "넘나드는 바닷길"을 그어보자.', deep:'맑은 날에는 여기서 대마도가 보인다. 눈에 보이지만 마음대로 넘을 수 없는 선은 무엇일까? 그 선을 넘나든 사람이나 물건의 예를 하나 들어보자.'},
+    {code:'A', name:'태종대 전망대', line:'수평선 너머 대한해협, 나라와 나라의 경계', pins:['go1','ma1'], note:'n1', shot:'바다 쪽을 찍고, 수평선과 양옆으로 물러난 해안선을 파랑으로 그어보자. 대마도가 보이면 수평선 위 대마도에 빨강으로 표시해 보자.', deep:'맑은 날에는 여기서 대마도가 보인다. 눈에 보이지만 마음대로 넘을 수 없는 선은 무엇일까? 그 선을 넘나든 사람이나 물건의 예를 하나 들어보자.'},
     {code:'B', name:'영도등대', line:'뱃길을 가르는 빛의 선, 절벽 밑동을 파고드는 바다', pins:['go2','seok1'], shot:'등대 아래 절벽을 찍고, 파도가 파고든 절벽 밑동의 선을 파랑으로, 등대·난간·계단처럼 사람이 만든 선을 빨강으로 그어보자.'},
     {code:'C', name:'신선바위·망부석 조망 지점', line:'물 위로 올라온 옛 바닷가의 선, 그리고 통제선', pins:['seok2','go3'], note:'n2', shot:'신선바위가 보이게 찍고, 평평한 바위(파식대)의 가장자리를 파랑으로, 통제선을 빨강으로 그어보자.', deep:'파도가 깎은 평원이 왜 물 위에 있을까? 태종대 해안에 절벽과 평탄면이 계단처럼 반복되는 이유와 함께 생각해보자.'},
     {code:'D', tag:'사건 현장', name:'태종사 앞 쉼터', line:'보고서가 사라진 곳', pins:['ma2','oh1']},
     {code:'E', name:'자갈마당', line:'깎이는 곶과 쌓이는 만의 경계', pins:['oh2','ma3'], shot:'자갈마당 해안선 전체가 보이게 찍고, 쑥 들어간 만의 해안선을 파랑으로 그어보자.'},
-    {code:'F', tag:'최종 집결지', name:'감지해변', line:'이안제 · 자갈 둔덕 · 계단식 호안, 세 개의 선', pins:['oh3','seok3'], note:'n3', key:true, shot:'⭐ 핵심 채증. 감지해변을 찍고 세 개의 선을 모두 그어라. 바다 속 이안제와 해변 뒤 계단식 호안은 빨강, 파도가 쌓은 자갈 둔덕은 파랑. 해녀가 바다로 드나드는 길이 보이면 초록 점선.', deep:'이안제 뒤쪽의 해안선을 보라. 다른 곳보다 바다 쪽으로 볼록 튀어나왔는가? 그렇다면, 혹은 아니라면 왜일까?', verify:true}
+    {code:'F', tag:'최종 집결지', name:'감지해변', line:'이안제 · 자갈 둔덕 · 계단식 호안, 세 개의 선', pins:['oh3','seok3'], note:'n3', key:true, shot:'⭐ 핵심 채증. 감지해변을 찍고 세 개의 선을 모두 그어라. 바다 속 이안제와 해변 뒤 계단식 호안은 빨강, 파도가 쌓은 자갈 둔덕은 파랑.', deep:'이안제 뒤쪽의 해안선을 보라. 다른 곳보다 바다 쪽으로 볼록 튀어나왔는가? 그렇다면, 혹은 아니라면 왜일까?', verify:true}
   ];
   var PINS = {
     go1:{who:'go', n:1, img:'tsushima.jpg', photo:'맑은 날 전망대에서 본 수평선. 배 뒤로 길게 보이는 산 그림자가 대마도다.', q:'전망대 난간 앞에서 사진처럼 수평선 위에 산 그림자가 보이는 쪽을 찾아라. 휴대폰 나침반 앱이나 가지고 있는 나침반을 그 방향으로 향하게 들고, 바늘이 가리키는 방위와 비교하자. 고하늘이 찍었다는 대마도 쪽 수평선은 어느 방향인가? (흐려서 섬이 안 보이면, 사진 속 수평선과 배의 모습이 비슷한 쪽을 찾아보자.)', type:'한글 2자', ans:['남동','남남동'], hint:'나침반의 N(북)을 등지고 서면 앞이 남쪽이에요. 대마도는 남쪽에서 왼쪽(동쪽)으로 조금 치우쳐 있어요.',
@@ -1011,7 +1010,7 @@ label.gloc{font-family:var(--body);font-size:14px;color:var(--ink);cursor:pointe
              '<polyline points="'+pts+'" fill="none" stroke="'+COLORS[s.c]+'" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"'+(s.c==='x'?' stroke-dasharray="9 7"':'')+'/>';
     }).join('')+'</svg>';
   }
-  var LEGEND='<div class="legend"><span class="n"><i></i>자연이 그은 선</span><span class="h"><i></i>사람이 그은 선</span><span class="x"><i></i>넘나드는 선</span></div>';
+  var LEGEND='<div class="legend"><span class="n"><i></i>자연이 그은 선</span><span class="h"><i></i>사람이 그은 선</span></div>';
   function shotHtml(s){
     var code=s.code.charAt(0), P=PHOTOS[code];
     return '<div class="shot'+(s.key?' key':'')+'"><div class="st"><span>📸 현장 채증 · 사진 위에 선 긋기</span>'+(P&&P.strokes&&P.strokes.length?'<span class="msg ok">선 '+P.strokes.length+'개</span>':'')+'</div>'+
@@ -1051,7 +1050,7 @@ label.gloc{font-family:var(--body);font-size:14px;color:var(--ink);cursor:pointe
     var site=SITES.filter(function(s){return s.code.charAt(0)===code})[0];
     ED.code=code; ED.strokes=JSON.parse(JSON.stringify(P.strokes||[])); ED.img=new Image();
     $('drawTitle').textContent=code+' '+site.name+' · 선 긋기';
-    $('drawSub').textContent=site.key?'이안제·호안은 빨강, 자갈 둔덕은 파랑, 해녀의 길은 초록':'파랑은 자연이 그은 선, 빨강은 사람이 그은 선';
+    $('drawSub').textContent=site.key?'이안제·호안은 빨강, 자갈 둔덕은 파랑':'파랑은 자연이 그은 선, 빨강은 사람이 그은 선';
     ED.img.onload=function(){ $('drawer').hidden=false; document.body.style.overflow='hidden'; fitCanvas(); redraw(); $('drawDone').focus(); };
     ED.img.src=P.src;
   }
@@ -1162,7 +1161,7 @@ label.gloc{font-family:var(--body);font-size:14px;color:var(--ink);cursor:pointe
       [70,108,146].forEach(function(x){ s+='<path d="M'+x+' 304 l16 -20 l16 20" fill="#f1e3c4" stroke="'+PENCIL+'" stroke-width="1.6"/>'; });
       s+=T(64,352,'조개구이 천막',{s:16,c:PENCIL});
       // haenyeo path
-      s+='<path d="M210 300 C 214 260, 200 210, 214 156" fill="none" stroke="#2c9a4b" stroke-width="2.4" stroke-dasharray="3 5"/>'+T(220,290,'해녀 할머니 길',{s:16,c:'#2c7a3b'});
+      s+='<path d="M210 300 C 214 260, 200 210, 214 156" fill="none" stroke="#7a7a7a" stroke-width="2" stroke-dasharray="3 5"/>'+T(220,290,'해녀 할머니 길',{s:16,c:'#5b5b5b'});
       // notes
       s+=T(56,392,'① 아래 줄: 평소 파도가 자갈을 밀어 올린 자리',{s:18});
       s+=T(56,416,'② 위 줄: 태풍 때 큰 파도가 올라온 자리',{s:18});
