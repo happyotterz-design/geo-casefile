@@ -522,6 +522,7 @@ label.gloc{font-family:var(--body);font-size:14px;color:var(--ink);cursor:pointe
 </section>
 
 <input type="file" id="photoInput" accept="image/*" capture="environment" hidden>
+<input type="file" id="photoInputG" accept="image/*" hidden>
 <div id="celebrate" hidden role="dialog" aria-modal="true" aria-labelledby="celTitle">
   <div class="cel">
     <svg viewBox="0 0 200 200" aria-hidden="true">
@@ -804,6 +805,7 @@ label.gloc{font-family:var(--body);font-size:14px;color:var(--ink);cursor:pointe
   $('missions').addEventListener('click',function(e){
     var b=e.target.closest('button'); if(!b) return;
     if(b.dataset.shot){ pickPhoto(b.dataset.shot); return; }
+    if(b.dataset.pick){ pickPhoto(b.dataset.pick,true); return; }
     if(b.dataset.draw){ openEditor(b.dataset.draw); return; }
     if(b.dataset.savephoto){ savePhotoFile(b.dataset.savephoto); return; }
     if(b.dataset.sendphoto){ sendPhoto(b.dataset.sendphoto, b); return; }
@@ -1015,10 +1017,10 @@ label.gloc{font-family:var(--body);font-size:14px;color:var(--ink);cursor:pointe
     return '<div class="shot'+(s.key?' key':'')+'"><div class="st"><span>📸 현장 채증 · 사진 위에 선 긋기</span>'+(P&&P.strokes&&P.strokes.length?'<span class="msg ok">선 '+P.strokes.length+'개</span>':'')+'</div>'+
       '<p class="sp">'+esc(s.shot)+'</p>'+LEGEND+
       (P ? '<div class="thumb"><img src="'+P.src+'" alt="'+esc(s.name)+'에서 찍은 사진"><span>'+overlaySVG(P.strokes)+'</span></div>'+
-           '<div class="shotbtns"><button type="button" class="primary small" data-draw="'+code+'">선 긋기 / 고치기</button><button type="button" class="ghost small" data-shot="'+code+'">사진 다시 찍기</button><button type="button" class="ghost small" data-delshot="'+code+'">삭제</button></div>'+
+           '<div class="shotbtns"><button type="button" class="primary small" data-draw="'+code+'">선 긋기 / 고치기</button><button type="button" class="ghost small" data-shot="'+code+'">📸 다시 찍기</button><button type="button" class="ghost small" data-pick="'+code+'">🖼 갤러리에서</button><button type="button" class="ghost small" data-delshot="'+code+'">삭제</button></div>'+
            '<div class="shotbtns" style="margin-top:8px"><button type="button" class="ghost small" data-savephoto="'+code+'">💾 사진 저장</button><button type="button" class="primary small" data-sendphoto="'+code+'">📤 선생님께 제출</button></div>'+
            '<div class="msg'+(S.sent&&S.sent[code]?' ok':'')+'" id="sendmsg-'+code+'">'+(S.sent&&S.sent[code]?'제출 완료 · '+S.sent[code]:'')+'</div>'
-         : '<div class="shotbtns" style="margin-top:8px"><button type="button" class="primary small" data-shot="'+code+'">📸 사진 찍기</button></div>')+
+         : '<div class="shotbtns" style="margin-top:8px"><button type="button" class="primary small" data-shot="'+code+'">📸 사진 찍기</button><button type="button" class="ghost small" data-pick="'+code+'">🖼 갤러리에서 고르기</button></div>')+
       '</div>';
   }
   function renderGallery(){
@@ -1028,8 +1030,8 @@ label.gloc{font-family:var(--body);font-size:14px;color:var(--ink);cursor:pointe
       : '<div class="locked">아직 찍은 사진이 없어요. 현장 미션의 📸 현장 채증 칸에서 사진을 찍고 선을 그어보세요.</div>';
   }
   var shotTarget=null;
-  function pickPhoto(code){ shotTarget=code; $('photoInput').click(); }
-  $('photoInput').addEventListener('change',function(){
+  function pickPhoto(code,gallery){ shotTarget=code; $(gallery?'photoInputG':'photoInput').click(); }
+  function onPhotoPicked(){
     var f=this.files&&this.files[0]; this.value=''; if(!f||!shotTarget) return;
     var code=shotTarget, rd=new FileReader();
     rd.onload=function(){ var im=new Image(); im.onload=function(){
@@ -1038,7 +1040,9 @@ label.gloc{font-family:var(--body);font-size:14px;color:var(--ink);cursor:pointe
       PHOTOS[code]={src:c.toDataURL('image/jpeg',.8),strokes:[],at:Date.now()}; savePhotos(); rerender(); openEditor(code);
     }; im.onerror=function(){ alertMsg(code,'사진을 읽지 못했어요. 다른 사진으로 다시 해보세요.'); }; im.src=rd.result; };
     rd.readAsDataURL(f);
-  });
+  }
+  $('photoInput').addEventListener('change',onPhotoPicked);
+  $('photoInputG').addEventListener('change',onPhotoPicked);
   function alertMsg(code,t){ var s=document.querySelector('[data-shot="'+code+'"]'); if(s){ s.textContent=t; } }
 
   var ED={code:null,strokes:[],pen:'n',img:null,cur:null};
